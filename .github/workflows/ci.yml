@@ -46,6 +46,8 @@ jobs:
   e2e:
     name: Testes e2e (${{ matrix.app }})
     runs-on: ubuntu-latest
+    # A instalação das dependências do WebKit pelo apt já travou por horas; melhor falhar logo.
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
@@ -59,6 +61,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @morning-paper/${{ matrix.app }} exec playwright install --with-deps chromium webkit
+        timeout-minutes: 10
       - run: pnpm test:e2e:${{ matrix.app }}
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
