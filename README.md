@@ -7,7 +7,7 @@
 
 Your newspaper, every morning: a macOS desktop app that puts together a private edition of the news and prints it in black and white on A4 paper.
 
-**[Download for Mac](https://julianosirtori.github.io/morning-paper-app/)** · [Releases](https://github.com/julianosirtori/morning-paper-app/releases)
+**[Download for Mac](https://morning-paper-app.julianosirtori.dev/)** · [Releases](https://github.com/julianosirtori/morning-paper-app/releases)
 
 ![Morning Paper home screen showing the front page of today's edition](docs/screenshots/today.png)
 

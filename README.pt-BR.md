@@ -7,7 +7,7 @@
 
 Seu jornal, toda manhã: um app de desktop para macOS que monta uma edição particular de notícias e imprime em preto e branco, no tamanho A4.
 
-**[Baixar para Mac](https://julianosirtori.github.io/morning-paper-app/)** · [Releases](https://github.com/julianosirtori/morning-paper-app/releases)
+**[Baixar para Mac](https://morning-paper-app.julianosirtori.dev/)** · [Releases](https://github.com/julianosirtori/morning-paper-app/releases)
 
 ![Tela inicial do Morning Paper com a capa da edição do dia](docs/screenshots/today.pt-BR.png)
 
