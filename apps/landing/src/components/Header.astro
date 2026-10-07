@@ -1,0 +1,18 @@
+---
+import Icon from "./Icon.astro";
+import DownloadButton from "./DownloadButton.astro";
+import { BASE, NAV, REPO_URL } from "../config";
+---
+
+<a class="skip" href="#conteudo">Pular para o conteúdo</a>
+<header class="site-header" id="topo">
+  <div class="wrap">
+    <a class="wordmark" href={BASE} aria-label="Morning Paper, início">Morning Paper</a>
+    <nav class="nav" aria-label="Seções da página">
+      {NAV.map((item) => <a href={item.href}>{item.label}</a>)}
+    </nav>
+    <a class="gh-link" href={REPO_URL} aria-label="Código do Morning Paper no GitHub"><Icon name="github" class="i-fill" /><span>GitHub</span></a>
+    <DownloadButton variant="header" />
+  </div>
+</header>
+<div id="sentinel" aria-hidden="true"></div>

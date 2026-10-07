@@ -1,0 +1,1323 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Morning Paper</title>
+<style>
+/* OD-LAYOUT-PRIMITIVES v1 — structure only: display, flex/grid, overflow, wrapping, ratio.
+   Put this @layer first; product CSS outside the layer always wins. */
+@layer od-layout {
+  :where(.od-stack,.od-row,.od-row-top,.od-cluster,.od-grid,.od-field,.od-stat,.od-cell,.od-tile) > :where(*) { min-width: 0; }
+  .od-stack   { display: flex; flex-direction: column; gap: var(--od-gap, 8px); }
+  .od-row     { display: flex; align-items: center; gap: var(--od-gap, 8px); }
+  .od-row-top { display: flex; align-items: flex-start; gap: var(--od-gap, 8px); }
+  .od-cluster { display: flex; flex-wrap: wrap; align-items: center; gap: var(--od-gap, 8px); }
+  .od-fill    { flex: 1 1 0; min-width: 0; }
+  .od-fixed   { flex: none; }
+  .od-grid    { display: grid; gap: var(--od-gap, 12px); grid-template-columns: repeat(var(--od-cols, 3), minmax(0, 1fr)); }
+  .od-stat, .od-field, .od-cell { display: grid; gap: var(--od-gap, 2px); }
+  :where(.od-stat,.od-field,.od-cell) > :where(*) { display: block; }
+  .od-tile { display: grid; grid-template-rows: auto 1fr; }
+  :where(.od-tile) > :where(*) { display: block; }
+  .od-media { display: block; width: 100%; height: auto; aspect-ratio: var(--od-ratio, auto); }
+  .od-media-cover { object-fit: cover; }
+  .od-truncate { display: block; max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .od-clamp-2, .od-clamp-3 { display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+  .od-clamp-2 { -webkit-line-clamp: 2; }
+  .od-clamp-3 { -webkit-line-clamp: 3; }
+  .od-lines-2 { min-height: calc(2 * 1.4em); }
+  .od-nowrap  { white-space: nowrap; }
+  .od-keep    { word-break: keep-all; overflow-wrap: anywhere; }
+  .od-screen { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; height: 100%; }
+  .od-scroll { overflow-y: auto; overscroll-behavior: contain; min-height: 0; }
+  .od-rail { display: flex; gap: var(--od-gap, 8px); overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none;
+             padding-inline: var(--od-rail-pad, 16px); scroll-padding-inline: var(--od-rail-pad, 16px); }
+  .od-rail::-webkit-scrollbar { display: none; }
+  :where(.od-rail) > :where(*) { flex: none; scroll-snap-align: start; }
+  :where(.od-rail) > :where(:last-child) { margin-inline-end: var(--od-rail-pad, 16px); }
+  .od-spacer { flex: none; visibility: hidden; pointer-events: none; }
+  .od-touch  { min-width: 44px; min-height: 44px; }
+}
+/* /OD-LAYOUT-PRIMITIVES v1 */
+
+/* ============ Tokens ============
+   Interface: um único acento editorial (vermelho), usado só em eyebrow, foco e alertas.
+   Jornal (.page): estritamente preto, cinza e branco — economia de tinta. */
+:root{
+  --paper:#f7f6f3; --panel:#efeeea; --panel-2:#e5e3de; --sel:#d9d6cf; --desk:#d9d8d4; --frame:#c4c1ba;
+  --ink:#1a1917; --ink-2:#3a3834; --muted:#5f5c56; --line:#d6d3cc; --line-strong:#8c8880;
+  --accent:#a8322a; --accent-press:#8c2922; --ok:#2f6b48; --on-ink:#f7f6f3; --field:#ffffff;
+
+  --np-paper:#fdfdfc; --np-ink:#111111; --np-grey:#5a5a5a; --np-rule:#b8b8b8; --np-light:#e4e4e4;
+
+  --serif:Georgia,'Times New Roman',serif;
+  --blackletter:'UnifrakturMaguntia','Old English Text MT',Georgia,serif; /* letra gótica do nome do jornal */
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+
+  --fs-12:12px; --fs-13:13px; --fs-14:14px; --fs-16:16px; --fs-20:20px; --fs-28:28px; --fs-40:clamp(32px,3.2vw,40px);
+  --s-1:4px; --s-2:8px; --s-3:12px; --s-4:16px; --s-5:24px; --s-6:32px; --s-7:48px;
+  --r-ctl:4px; --r-pop:8px; --bar-h:56px;
+  --dur:180ms; --ease-out:cubic-bezier(.2,.7,.2,1); --ease-in:cubic-bezier(.5,0,.75,0);
+  --shadow-win:0 24px 64px rgba(26,25,23,.18); --shadow-pop:0 12px 32px rgba(26,25,23,.18); --shadow-page:0 8px 24px rgba(26,25,23,.12);
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--desk);color:var(--ink);font:var(--fs-14)/1.5 var(--sans);-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+button:disabled{cursor:not-allowed}
+h1,h2,h3,p,figure,dl,dd,ol,ul{margin:0}
+ol,ul{padding:0;list-style:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+svg.i{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+[hidden]{display:none!important}
+
+/* ============ Botões: primário (1 por tela) · secundário · texto ============ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--s-2);min-height:36px;padding:0 14px;border:1px solid var(--line-strong);border-radius:var(--r-ctl);background:transparent;color:var(--ink);font:600 var(--fs-14)/1 var(--sans);white-space:nowrap;transition:background-color var(--dur) var(--ease-out),border-color var(--dur) var(--ease-out)}
+.btn-primary{background:var(--ink);border-color:var(--ink);color:var(--on-ink)}
+.btn-danger{background:var(--accent);border-color:var(--accent);color:var(--on-ink)}
+.btn-sm{min-height:32px;padding:0 12px;font-size:var(--fs-13)}
+.btn:disabled{opacity:.55}
+.btn-text{display:inline-flex;align-items:center;gap:6px;min-height:28px;border:0;background:none;padding:0;color:var(--ink);font:600 var(--fs-14)/1.2 var(--sans);text-decoration:underline;text-decoration-color:var(--line-strong);text-underline-offset:4px;text-align:left}
+.btn-text:disabled{color:var(--muted);text-decoration:none}
+.icon-btn{display:inline-grid;place-items:center;width:32px;height:32px;border:0;border-radius:var(--r-ctl);background:none;color:var(--ink)}
+.icon-btn:disabled{opacity:.4}
+@media (hover:hover){
+  .btn:not(:disabled):hover{background:var(--panel-2)}
+  .btn-primary:not(:disabled):hover{background:var(--ink-2);border-color:var(--ink-2)}
+  .btn-danger:not(:disabled):hover{background:var(--accent-press);border-color:var(--accent-press)}
+  .btn-text:not(:disabled):hover{text-decoration-color:var(--accent)}
+  .icon-btn:not(:disabled):hover{background:var(--panel-2)}
+}
+
+/* ============ Barra de menus do macOS (simulação do ambiente) ============ */
+.menubar{height:28px;display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 16px;background:var(--panel);border-bottom:1px solid var(--line);font:var(--fs-13)/1 var(--sans);position:relative;z-index:30}
+.mb-apps{display:flex;gap:18px}
+.mb-apps b{font-weight:700}
+.mb-status{display:flex;align-items:center;gap:4px}
+.mb-item{height:24px;min-width:28px;padding:0 6px;border:0;border-radius:5px;background:none;display:inline-flex;align-items:center;justify-content:center}
+.mb-item[aria-expanded="true"]{background:var(--panel-2)}
+@media (hover:hover){.mb-item:hover{background:var(--panel-2)}}
+.mb-clock{padding:0 8px;font-variant-numeric:tabular-nums}
+.menu{position:fixed;z-index:40;width:300px;background:var(--paper);border:1px solid var(--line);border-radius:var(--r-pop);box-shadow:var(--shadow-pop);padding:6px}
+#row-menu{width:220px}
+.menu-head{padding:10px 12px 12px}
+.menu-head strong{display:block;font:600 var(--fs-16)/1.25 var(--serif)}
+.menu-head span{font-size:var(--fs-12);color:var(--muted)}
+.menu-head > span{display:block;margin-top:4px}
+.menu-group{border-top:1px solid var(--line);margin-top:6px;padding-top:6px}
+.menu-label{padding:6px 12px 2px;font-size:var(--fs-12);color:var(--muted)}
+.menu [role^="menuitem"]{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;min-height:32px;border:0;background:none;border-radius:5px;padding:6px 12px;font:var(--fs-13)/1.2 var(--sans);color:var(--ink);text-align:left}
+.menu [role^="menuitem"]:hover,.menu [role^="menuitem"]:focus-visible{background:var(--ink);color:var(--on-ink);outline:0}
+.menu kbd{font:var(--fs-12) var(--sans);opacity:.75}
+.menu .is-danger{color:var(--accent)}
+.menu [aria-checked]{justify-content:flex-start}
+.menu [aria-checked]::before{content:'';width:14px;flex:none}
+.menu [aria-checked="true"]::before{content:'✓'}
+
+/* ============ Janela ============ */
+.window{width:min(1440px,calc(100vw - 32px));height:calc(100vh - 32px);min-height:600px;margin:16px auto;background:var(--paper);border:1px solid var(--frame);border-radius:10px;box-shadow:var(--shadow-win);display:grid;grid-template-rows:minmax(0,1fr);overflow:hidden}
+/* Barra unificada (padrão macOS): os botões da janela ficam no topo da sidebar,
+   na mesma faixa da barra de ferramentas — um único cabeçalho na janela. */
+.traffic{display:flex;align-items:center;gap:8px;height:var(--bar-h);padding-left:8px;flex:none}
+.traffic button,.traffic span{width:12px;height:12px;border-radius:50%;border:0;padding:0;background:var(--frame)}
+.traffic button{background:var(--line-strong);display:grid;place-items:center}
+.traffic button svg{width:8px;height:8px;opacity:0;stroke:var(--on-ink);stroke-width:2.4}
+.traffic:hover button svg,.traffic button:focus-visible svg{opacity:1}
+.kbd-hint{display:inline-flex;align-items:center;gap:8px;min-height:36px;padding:0 10px;border:1px solid var(--line);border-radius:var(--r-ctl);background:var(--paper);color:var(--muted);font-size:var(--fs-12)}
+.kbd-hint kbd{font:inherit;color:var(--ink)}
+
+/* Cada área ocupa só a altura disponível e rola por dentro */
+.app{display:grid;grid-template-columns:224px minmax(0,1fr);grid-template-rows:minmax(0,1fr);min-height:0}
+
+/* Sidebar */
+.side{background:var(--panel);border-right:1px solid var(--line);padding:0 var(--s-3) var(--s-4);display:flex;flex-direction:column;gap:var(--s-2);min-height:0;overflow-y:auto}
+.brand{padding:0 10px var(--s-4)}
+.brand b{display:block;font:700 24px/.9 var(--serif);letter-spacing:-.03em;text-transform:uppercase}
+.brand small{display:block;margin-top:8px;font:var(--fs-12)/1.3 var(--sans);color:var(--muted)}
+.nav-label{padding:var(--s-3) 10px var(--s-1);font:600 var(--fs-12)/1 var(--sans);color:var(--muted)}
+.nav{display:grid;gap:2px}
+.nav a{display:flex;align-items:center;gap:10px;min-height:36px;padding:0 10px;border-radius:var(--r-ctl);color:var(--ink-2);font-weight:500;text-decoration:none}
+.nav a .count{margin-left:auto;font-size:var(--fs-12);color:var(--muted);font-variant-numeric:tabular-nums}
+/* Seleção no padrão da sidebar do macOS: área preenchida, sem borda nem contorno */
+.nav a[aria-current="page"]{background:var(--sel);color:var(--ink);font-weight:600}
+@media (hover:hover){.nav a:not([aria-current]):hover{background:var(--panel-2)}}
+.side-foot{margin-top:auto;padding:var(--s-4) 10px 0;border-top:1px solid var(--line);font-size:var(--fs-12);color:var(--muted)}
+.side-foot b{display:block;color:var(--ink);font-weight:600}
+
+/* Workspace + toolbar */
+.workspace{min-width:0;min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr)}
+.toolbar{min-height:var(--bar-h);display:flex;align-items:center;justify-content:space-between;gap:var(--s-4);padding:var(--s-2) var(--s-5) var(--s-2) var(--s-6);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.tb-right{display:flex;align-items:center;gap:var(--s-4)}
+.tb-where{min-width:0}
+.tb-where b{display:block;font:600 var(--fs-16)/1.2 var(--serif)}
+.tb-where span{display:block;font-size:var(--fs-12);color:var(--muted)}
+.tb-actions{display:flex;gap:var(--s-2)}
+.view{overflow:auto;min-height:0;overscroll-behavior:contain;padding:var(--s-6) var(--s-7) var(--s-7)}
+.view-in{max-width:1180px;margin:0 auto}
+.view-header{border-bottom:2px solid var(--ink);padding-bottom:var(--s-5);margin-bottom:var(--s-6)}
+.eyebrow{font:700 var(--fs-12)/1.3 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+h1{font:400 var(--fs-40)/1.05 var(--serif);letter-spacing:-.02em;margin:var(--s-2) 0}
+h2{font:500 var(--fs-28)/1.15 var(--serif);letter-spacing:-.01em}
+h3{font:600 var(--fs-20)/1.25 var(--serif)}
+.lead{font-size:var(--fs-16);color:var(--muted);max-width:62ch}
+.section-title{font:600 var(--fs-20)/1.25 var(--serif);padding-bottom:var(--s-3);border-bottom:1px solid var(--ink);margin-bottom:var(--s-2)}
+.note{font-size:var(--fs-13);color:var(--muted)}
+
+/* Fatos (lista de dados) */
+.facts div{display:grid;grid-template-columns:auto minmax(0,1fr);gap:var(--s-4);align-items:baseline;padding:var(--s-3) 0;border-bottom:1px solid var(--line)}
+.facts dt{color:var(--muted)}
+.facts dd{font:600 var(--fs-16)/1.3 var(--serif);text-align:right}
+.facts dd .btn-text{font-size:var(--fs-13);margin-left:var(--s-2)}
+.st{display:inline-flex;align-items:center;gap:6px;font:500 var(--fs-13)/1.3 var(--sans)}
+.st-ok{color:var(--ok)}
+.st-err{color:var(--accent)}
+.st-muted{color:var(--muted)}
+.st svg{width:14px;height:14px}
+
+/* ============ Hoje ============ */
+.today-grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(280px,.7fr);gap:var(--s-7);align-items:start}
+.paper-link{display:block;color:inherit;text-decoration:none;border-radius:2px;transition:transform var(--dur) var(--ease-out)}
+.paper-link .page{transition:box-shadow var(--dur) var(--ease-out)}
+@media (hover:hover){.paper-link:hover{transform:translateY(-2px)}.paper-link:hover .page{box-shadow:0 14px 32px rgba(26,25,23,.18)}}
+.paper-hint{display:flex;justify-content:space-between;flex-wrap:wrap;gap:var(--s-1) var(--s-3);margin-top:var(--s-3);font-size:var(--fs-13);color:var(--muted)}
+.today-side{display:grid;gap:var(--s-6)}
+.timeline li{display:grid;grid-template-columns:48px 20px minmax(0,1fr);gap:var(--s-3);padding-bottom:var(--s-4);position:relative}
+.timeline li:not(:last-child)::after{content:'';position:absolute;left:calc(48px + 12px + 9.5px);top:24px;bottom:4px;width:1px;background:var(--line-strong)}
+.timeline time{font:600 var(--fs-13)/20px var(--sans);font-variant-numeric:tabular-nums;color:var(--muted)}
+.tl-mark{width:20px;height:20px;border-radius:50%;background:var(--ink);color:var(--on-ink);display:grid;place-items:center}
+.tl-mark svg{width:12px;height:12px;stroke-width:2.4}
+.tl-text b{display:block;font-weight:600;line-height:20px}
+.tl-text > span{display:block;font-size:var(--fs-13);color:var(--muted)}
+.next-block{border-top:2px solid var(--ink);padding-top:var(--s-4)}
+.next-block h3{margin:var(--s-2) 0 var(--s-1)}
+.next-block p{color:var(--muted);margin-bottom:var(--s-3)}
+
+/* Fonte gótica do nome do jornal — UnifrakturMaguntia (SIL OFL, ver fonts/OFL.txt), arquivo local */
+@font-face{font-family:'UnifrakturMaguntia';src:url('fonts/UnifrakturMaguntia.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+
+/* ============ Página de jornal (preto e branco) ============
+   Proporções de jornal impresso em A4 (100cqi = 210 mm): margem ~8 mm (3,8cqi),
+   corpo ~8,5 pt (1,42cqi) com entrelinha 1,3, colunas estreitas com fio entre elas,
+   texto justificado com recuo de parágrafo e capitular na matéria principal. */
+.page{container-type:inline-size;background:var(--np-paper);color:var(--np-ink);border:1px solid var(--np-rule);box-shadow:var(--shadow-page);aspect-ratio:1/1.414;width:100%}
+.page-in{height:100%;display:flex;flex-direction:column;padding:3.6cqi 3.8cqi 3cqi;font:1.42cqi/1.3 var(--serif)}
+.np-mast{display:grid;grid-template-columns:1fr auto 1fr;align-items:end;gap:2cqi;padding-bottom:.8cqi}
+.np-mast b{font:400 7.6cqi/1 var(--blackletter);letter-spacing:0;text-align:center;white-space:nowrap}
+.np-ear{display:grid;gap:.2cqi;font:1.1cqi/1.25 var(--sans);text-transform:uppercase;letter-spacing:.06em}
+.np-ear > span{display:block}
+.np-ear-r{text-align:right}
+.np-sechead{display:flex;justify-content:space-between;align-items:baseline;gap:2cqi;padding-bottom:.6cqi}
+.np-sechead b{font:400 3cqi/1 var(--blackletter)}
+.np-sechead span{font:800 1.3cqi/1.2 var(--sans);letter-spacing:.12em;text-transform:uppercase}
+.np-dateline{display:flex;justify-content:space-between;gap:2cqi;border-top:.15cqi solid;border-bottom:.5cqi double;padding:.45cqi 0;margin:0 0 1.6cqi;font:600 1.05cqi/1.2 var(--sans);letter-spacing:.08em;text-transform:uppercase}
+.np-lead{display:grid;grid-template-columns:minmax(0,2.15fr) minmax(0,1fr);border-bottom:.15cqi solid;padding-bottom:1.4cqi}
+.np-lead-main{padding-right:1.8cqi}
+.np-kicker{font:800 1.1cqi/1.2 var(--sans);letter-spacing:.12em;text-transform:uppercase;margin:0 0 .6cqi}
+.np-head{font:700 4.6cqi/1.02 var(--serif);letter-spacing:-.02em;margin:0;text-wrap:balance}
+.np-sub{font:italic 1.85cqi/1.25 var(--serif);margin:.8cqi 0 .8cqi}
+.np-byline{font:600 1.05cqi/1.2 var(--sans);letter-spacing:.06em;text-transform:uppercase;margin:0 0 1cqi;color:var(--np-grey)}
+.np-fig{margin:0 0 1.2cqi}
+.np-fig .np-img{aspect-ratio:16/9}
+.np-cap{font:1.1cqi/1.3 var(--sans);color:var(--np-grey);margin-top:.5cqi}
+.np-text{columns:3;column-gap:1.6cqi;column-rule:.1cqi solid var(--np-rule)}
+.np-text p,.np-story p{margin:0;text-align:justify;hyphens:auto;text-indent:1.2em}
+.np-text p:first-child,.np-story h3 + p{text-indent:0}
+.np-text p:first-child::first-letter{float:left;font:700 3.9cqi/.8 var(--serif);margin:.35cqi .5cqi 0 0}
+.np-side{border-left:.1cqi solid var(--np-rule);padding-left:1.8cqi;display:grid;align-content:start;gap:1.1cqi}
+.np-side-label{font:800 1.1cqi/1.2 var(--sans);letter-spacing:.12em;text-transform:uppercase;border-bottom:.35cqi solid;padding-bottom:.4cqi}
+.np-side .np-story + .np-story{border-top:.1cqi solid var(--np-rule);padding-top:1.1cqi}
+.np-story h3{font:700 1.95cqi/1.08 var(--serif);margin:0 0 .5cqi;break-after:avoid}
+.np-side .np-story:first-of-type h3{font-size:2.4cqi}
+.np-more{columns:4;column-gap:1.6cqi;column-rule:.1cqi solid var(--np-rule);padding-top:1.4cqi}
+.np-more .np-story{margin-bottom:1.3cqi}
+.np-list{counter-reset:np;display:grid;gap:.6cqi;break-inside:avoid}
+.np-list li{counter-increment:np;display:grid;grid-template-columns:2.2cqi 1fr;font:1.42cqi/1.3 var(--serif)}
+.np-list li::before{content:counter(np);font:700 1.7cqi/1 var(--serif)}
+.np-foot{margin-top:auto;border-top:.15cqi solid;padding-top:.6cqi;display:flex;justify-content:space-between;font:1.05cqi/1.2 var(--sans)}
+
+/* Capa em 5 colunas: a matéria principal ocupa 4 e "Em resumo" ocupa 1;
+   abaixo, matérias em 5 colunas e a faixa de notas curtas no rodapé. */
+.np-front .np-lead{grid-template-columns:repeat(5,minmax(0,1fr))}
+.np-front .np-lead-main{grid-column:span 4}
+.np-front .np-text{columns:4}
+.np-front .np-side{padding-left:1.4cqi}
+.np-front .np-side .np-story:first-of-type h3{font-size:1.95cqi}
+.np-front .np-more{columns:5}
+.np-briefs{margin-top:auto;border-top:.5cqi double;padding-top:.9cqi}
+.np-briefs + .np-foot{margin-top:.9cqi}
+.np-briefs-label{font:800 1.1cqi/1.2 var(--sans);letter-spacing:.12em;text-transform:uppercase;margin:0 0 .7cqi}
+.np-briefs-grid{columns:5;column-gap:1.6cqi;column-rule:.1cqi solid var(--np-rule)}
+.np-briefs-grid p{margin:0 0 .7cqi;break-inside:avoid;text-align:justify;hyphens:auto;font-size:1.3cqi}
+.np-briefs-grid b{font:800 1.1cqi/1 var(--sans);letter-spacing:.06em;text-transform:uppercase}
+
+/* Imagens editoriais em retícula (meio-tom) — ilustração, não foto de notícia */
+.np-img{aspect-ratio:4/3;position:relative;background-color:var(--np-light)}
+.np-img::before{content:'';position:absolute;inset:0;background:radial-gradient(circle,rgba(17,17,17,.5) 32%,transparent 36%) 0 0/4px 4px}
+.np-img--field{background-image:linear-gradient(180deg,#f2f2f2 0 40%,#cfcfcf 40% 52%,#8e8e8e 52% 70%,#4a4a4a 70%)}
+.np-img--field::after{content:'';position:absolute;width:24%;aspect-ratio:1;border-radius:50%;background:var(--np-paper);right:16%;top:12%}
+.np-img--city{background-image:linear-gradient(180deg,#ededed 0 30%,transparent 30%),linear-gradient(90deg,#5c5c5c 0 12%,#9c9c9c 12% 22%,#3c3c3c 22% 36%,#b4b4b4 36% 44%,#555555 44% 60%,#8a8a8a 60% 74%,#2e2e2e 74% 86%,#a6a6a6 86%)}
+.np-img--sea{background-image:linear-gradient(180deg,#e9e9e9 0 46%,#7a7a7a 46% 48%,#a9a9a9 48% 64%,#6e6e6e 64% 80%,#3d3d3d 80%)}
+.np-img--desk{background-image:radial-gradient(ellipse at 30% 60%,#3a3a3a 0 18%,transparent 19%),linear-gradient(160deg,#dcdcdc 0 55%,#9a9a9a 55%)}
+
+/* Estilos de edição */
+.page[data-style="modern"] .np-head,.page[data-style="modern"] .np-story h3{font-family:var(--sans);font-weight:800;letter-spacing:-.035em}
+.page[data-style="modern"] .np-sub{font-family:var(--sans);font-style:normal}
+.page[data-style="modern"] .np-dateline{border-bottom:.15cqi solid}
+.page[data-style="financial"] .np-dateline{background:var(--np-ink);color:var(--np-paper);border:0;padding:.6cqi 1cqi}
+.page[data-style="financial"] .np-kicker{display:inline-block;background:var(--np-ink);color:var(--np-paper);padding:.3cqi .8cqi}
+.page[data-style="financial"] .np-head{font-size:4cqi}
+.page[data-style="financial"] .np-more{columns:5}
+.page[data-style="minimal"] .np-head{font-weight:400;letter-spacing:-.03em}
+.page[data-style="minimal"] .np-text,.page[data-style="minimal"] .np-more{column-rule:0}
+.page[data-style="minimal"] .np-side{border-left:0}
+.page[data-style="minimal"] .np-dateline{border-bottom:.15cqi solid}
+.page[data-style="minimal"] .np-text p:first-child::first-letter{float:none;font:inherit;margin:0}
+
+/* ============ Edição ============ */
+.ed-layout{display:grid;grid-template-columns:96px minmax(0,1fr) 220px;gap:var(--s-6);align-items:start}
+.thumbs{display:grid;gap:var(--s-3)}
+.thumb{aspect-ratio:1/1.414;width:100%;border:1px solid var(--line-strong);background:var(--np-paper);padding:8px;text-align:left;display:flex;flex-direction:column;gap:6px;border-radius:2px}
+.thumb b{font:700 var(--fs-13)/1 var(--serif)}
+.thumb span{font-size:var(--fs-12);line-height:1.2;color:var(--muted)}
+.thumb i{flex:1;background:repeating-linear-gradient(180deg,var(--np-rule) 0 1px,transparent 1px 6px)}
+.thumb[aria-current="true"]{border:2px solid var(--ink);padding:7px}
+.stage{container-type:inline-size;background:var(--panel);border:1px solid var(--line);padding:var(--s-5);overflow:auto}
+.stage .page{width:calc(min(680px,100cqi) * var(--zoom,1));margin:0 auto}
+.inspector{border-top:2px solid var(--ink)}
+.insp{padding:var(--s-3) 0;border-bottom:1px solid var(--line);display:grid;gap:var(--s-2)}
+.insp > b{font-weight:600}
+.insp .od-row{justify-content:space-between}
+.zoom-row{display:grid;grid-template-columns:32px minmax(0,1fr) 32px;align-items:center;gap:var(--s-1)}
+input[type="range"]{width:100%;accent-color:var(--ink)}
+output{font-variant-numeric:tabular-nums}
+.ed-back{margin-top:var(--s-3)}
+
+/* ============ Fontes ============ */
+.table-wrap{overflow-x:auto}
+.src{width:100%;border-collapse:collapse;min-width:640px}
+.src th,.src td{padding:14px var(--s-3) 14px 0;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+.src thead th{font:600 var(--fs-12)/1.2 var(--sans);color:var(--muted);padding-top:0;padding-bottom:var(--s-2);border-bottom:1px solid var(--ink)}
+.src tbody th{font:600 var(--fs-16)/1.3 var(--serif)}
+.src .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.src .act{width:44px;text-align:right;padding-right:0}
+.src tr.is-paused th,.src tr.is-paused td:not(.act){color:var(--muted)}
+.prio{display:inline-block;padding:2px 8px;border:1px solid var(--line-strong);border-radius:var(--r-ctl);font-size:var(--fs-12);font-weight:600}
+.prio[data-p="Alta"]{background:var(--ink);border-color:var(--ink);color:var(--on-ink)}
+.src-empty{max-width:520px;padding:var(--s-7) 0}
+.src-empty .mark{width:36px;height:48px;border:2px solid var(--ink);border-bottom:0;margin-bottom:var(--s-4);position:relative}
+.src-empty .mark::after{content:'';position:absolute;left:6px;right:6px;top:10px;height:2px;background:var(--ink);box-shadow:0 8px var(--ink),0 16px var(--line-strong)}
+.src-empty h2{margin-bottom:var(--s-2)}
+.src-empty p{margin-bottom:var(--s-4)}
+
+/* ============ Revisar ============ */
+.rv{display:grid;grid-template-columns:120px minmax(0,1fr) 180px;gap:var(--s-5);padding:var(--s-5) 0;border-bottom:1px solid var(--line)}
+.rv-thumb{aspect-ratio:4/3}
+.rv-meta{font:600 var(--fs-12)/1.4 var(--sans);letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.rv-badge{display:inline-block;margin-top:var(--s-2);padding:2px 8px;background:var(--ink);color:var(--on-ink);font:600 var(--fs-12)/1.4 var(--sans);border-radius:var(--r-ctl)}
+.rv h3{margin:var(--s-2) 0 var(--s-1)}
+.rv-sum{font-size:var(--fs-16);color:var(--ink-2);max-width:62ch;margin-bottom:var(--s-2)}
+.rv-sum textarea{width:100%;min-height:96px;padding:var(--s-2) var(--s-3);border:1px solid var(--line-strong);border-radius:var(--r-ctl);background:var(--field);resize:vertical;line-height:1.5}
+.rv-edit-actions{display:flex;gap:var(--s-3);align-items:center;margin-top:var(--s-2)}
+.rv-link{font-size:var(--fs-13);color:var(--muted);text-underline-offset:3px}
+.rv-actions{display:grid;align-content:start;gap:var(--s-2);justify-items:start}
+.rv-state{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:var(--fs-13)}
+.rv-state.on{color:var(--ok)}
+.rv-state.off{color:var(--muted)}
+.rv-sec{display:grid;gap:2px;font-size:var(--fs-12);color:var(--muted);width:100%}
+.rv.is-out h3,.rv.is-out .rv-sum{color:var(--muted)}
+.rv.is-out .rv-thumb{opacity:.45}
+
+/* ============ Imprimir ============ */
+.print-grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:var(--s-7);align-items:start}
+.ticket{border:1px solid var(--ink);background:var(--np-paper);padding:var(--s-5)}
+.ticket-mast{font:700 32px/.85 var(--serif);text-transform:uppercase;letter-spacing:-.03em;border-bottom:3px solid var(--ink);padding-bottom:var(--s-3);margin-bottom:var(--s-2)}
+.ticket fieldset{border:0;padding:0;margin:var(--s-5) 0 0}
+.ticket legend{font-weight:600;margin-bottom:var(--s-2);padding:0}
+.stepper{display:inline-flex;align-items:center;border:1px solid var(--line-strong);border-radius:var(--r-ctl)}
+.stepper button{width:36px;height:36px;border:0;background:none;display:grid;place-items:center}
+.stepper button:disabled{opacity:.4}
+.stepper output{min-width:40px;text-align:center;font-weight:600}
+@media (hover:hover){.stepper button:not(:disabled):hover{background:var(--panel-2)}}
+.choice{display:flex;align-items:center;gap:var(--s-2);min-height:32px}
+.choice input{accent-color:var(--ink);width:16px;height:16px;margin:0}
+.msg{margin-top:var(--s-4);padding-top:var(--s-3);border-top:1px solid var(--line);display:flex;gap:var(--s-2);align-items:flex-start}
+.msg svg{margin-top:2px}
+.msg.err{color:var(--accent)}
+.msg.ok{color:var(--ok)}
+.history li{border-bottom:1px solid var(--line)}
+.history button{display:flex;width:100%;justify-content:space-between;align-items:baseline;gap:var(--s-3);min-height:48px;padding:var(--s-3) 0;border:0;background:none;font:600 var(--fs-16)/1.3 var(--serif);text-align:left}
+.history button span{font:var(--fs-13) var(--sans);color:var(--muted);white-space:nowrap}
+@media (hover:hover){.history button:hover b{text-decoration:underline;text-underline-offset:4px}}
+
+/* ============ Preferências ============ */
+.prefs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s-6) var(--s-7)}
+.pref{border-top:2px solid var(--ink);padding-top:var(--s-4);display:grid;gap:var(--s-3);align-content:start}
+.pref h2{font-size:var(--fs-20)}
+.field{display:grid;gap:var(--s-1)}
+.field > label,.field > .lbl{font-weight:600}
+.field small{font-size:var(--fs-12);color:var(--muted)}
+select,input[type="text"],input[type="url"],input[type="password"]{min-height:36px;padding:0 var(--s-3);border:1px solid var(--line-strong);border-radius:var(--r-ctl);background:var(--field);width:100%}
+.inline-select{display:flex;align-items:center;justify-content:space-between;gap:var(--s-3)}
+.inline-select select{width:auto}
+.check{display:flex;align-items:center;gap:var(--s-2);min-height:32px}
+.check input{width:16px;height:16px;margin:0;accent-color:var(--ink)}
+.seg{display:inline-flex;justify-self:start;border:1px solid var(--line-strong);border-radius:var(--r-ctl);overflow:clip}
+.seg label{position:relative}
+.seg input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.seg span{display:grid;place-items:center;min-height:34px;padding:0 14px;font-weight:600;border-left:1px solid var(--line-strong)}
+.seg label:first-child span{border-left:0}
+.seg input:checked + span{background:var(--ink);color:var(--on-ink)}
+.seg input:focus-visible + span{outline:2px solid var(--accent);outline-offset:-4px}
+.switch-row{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--s-4);padding:var(--s-2) 0}
+.switch-row .p-name{display:block;font-weight:600}
+.switch-row .p-meta{display:block;font-size:var(--fs-13);color:var(--muted)}
+.switch{appearance:none;flex:none;width:38px;height:22px;border-radius:11px;background:var(--line-strong);position:relative;cursor:pointer;margin:2px 0 0;transition:background-color var(--dur) var(--ease-out)}
+.switch::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:var(--field);transition:transform var(--dur) var(--ease-out)}
+.switch:checked{background:var(--ink)}
+.switch:checked::after{transform:translateX(16px)}
+.switch:disabled{opacity:.45;cursor:not-allowed}
+.switch-row:has(.switch:disabled) .p-name{color:var(--muted)}
+.printers{display:grid;gap:2px}
+.printers label{display:flex;align-items:flex-start;gap:var(--s-2);padding:var(--s-2) 0;cursor:pointer}
+.printers input{margin:3px 0 0;accent-color:var(--ink);width:16px;height:16px;flex:none}
+.printers .p-name{display:block;font-weight:600}
+.printers .p-meta{display:block;font-size:var(--fs-13);color:var(--muted)}
+.printers .p-meta.off{color:var(--accent)}
+.topics{display:grid;gap:var(--s-1)}
+.topic{display:grid;grid-template-columns:100px minmax(0,1fr) 48px;align-items:center;gap:var(--s-3);min-height:32px}
+.topic label{font-weight:600}
+.topic output{text-align:right;font-weight:600}
+.topics-total{display:flex;justify-content:space-between;border-top:1px solid var(--line);padding-top:var(--s-2);font-size:var(--fs-13);color:var(--muted)}
+.styles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s-2)}
+.style-opt{position:relative;display:grid;gap:2px;padding:var(--s-3);border:1px solid var(--line-strong);border-radius:var(--r-ctl);cursor:pointer;background:var(--paper)}
+.style-opt input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.style-opt .sample{font:700 24px/1 var(--serif);letter-spacing:-.02em;margin-bottom:4px}
+.style-opt[data-s="modern"] .sample{font-family:var(--sans);font-weight:800;letter-spacing:-.04em}
+.style-opt[data-s="minimal"] .sample{font-weight:400}
+.style-opt[data-s="financial"] .sample{border-top:4px solid var(--ink);padding-top:4px}
+.style-opt b{font-weight:600}
+.style-opt small{font-size:var(--fs-12);color:var(--muted)}
+.style-opt:has(input:checked){border:2px solid var(--ink);padding:11px}
+.style-opt:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
+details.adv summary{cursor:pointer;font-weight:600;min-height:32px;display:flex;align-items:center;gap:var(--s-2);list-style:none}
+details.adv summary::-webkit-details-marker{display:none}
+details.adv summary svg{transition:transform var(--dur) var(--ease-out)}
+details.adv[open] summary svg{transform:rotate(90deg)}
+details.adv .adv-body{display:grid;gap:var(--s-3);padding-top:var(--s-3)}
+
+/* Assistentes de IA detectados no Mac (CLIs) */
+.pref-wide{grid-column:1/-1}
+.agents{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s-2)}
+.agent{position:relative;display:grid;gap:2px;align-content:start;padding:var(--s-3);border:1px solid var(--line-strong);border-radius:var(--r-ctl);cursor:pointer;background:var(--paper)}
+.agent input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.agent b{font-weight:600}
+.agent code{font:var(--fs-12)/1.3 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--muted);overflow-wrap:anywhere}
+.agent small{font-size:var(--fs-12);color:var(--muted)}
+.agent .st{margin-top:var(--s-1)}
+.agent:has(input:checked){border:2px solid var(--ink);padding:11px}
+.agent:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
+.agent:has(input:disabled){cursor:not-allowed;background:var(--panel);border-style:dashed}
+.agent:has(input:disabled) b{color:var(--muted)}
+.agents-foot{gap:var(--s-3)}
+@media (max-width:860px){.agents{grid-template-columns:1fr 1fr}}
+@media (max-width:720px){.agents{grid-template-columns:1fr}}
+
+/* ============ Diálogos ============ */
+dialog{border:0;padding:0;width:min(480px,calc(100vw - 32px));border-radius:var(--r-pop);box-shadow:var(--shadow-pop);background:var(--paper);color:var(--ink)}
+dialog::backdrop{background:rgba(26,25,23,.4)}
+.modal{padding:var(--s-5);display:grid;gap:var(--s-4)}
+.modal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:var(--s-3);border-bottom:2px solid var(--ink);padding-bottom:var(--s-3)}
+.modal-foot{display:flex;justify-content:flex-end;gap:var(--s-2);padding-top:var(--s-2)}
+.req{color:var(--accent)}
+.err-text{color:var(--accent);font-size:var(--fs-13)}
+[aria-invalid="true"]{border-color:var(--accent)!important;box-shadow:0 0 0 1px var(--accent)}
+.err-summary{border:1px solid var(--accent);border-radius:var(--r-ctl);padding:var(--s-3);color:var(--accent)}
+.err-summary ul{margin-top:var(--s-1);display:grid;gap:2px}
+.err-summary a{color:inherit;font-weight:600}
+.plain-fieldset{border:0;padding:0;margin:0}
+.plain-fieldset legend{font-weight:600;padding:0;margin-bottom:var(--s-1)}
+.prio-group{display:flex;gap:var(--s-4)}
+
+.palette{width:min(560px,calc(100vw - 32px));margin-top:12vh}
+.palette input{border:0;border-bottom:1px solid var(--line);border-radius:0;min-height:52px;padding:0 var(--s-4);font-size:var(--fs-16);background:transparent}
+.palette input:focus-visible{outline:0;border-bottom-color:var(--ink)}
+.pal-list{max-height:320px;overflow:auto;padding:6px}
+.pal-list li{display:flex;justify-content:space-between;gap:var(--s-3);padding:10px 12px;border-radius:5px;cursor:pointer}
+.pal-list li span{color:var(--muted);font-size:var(--fs-12)}
+.pal-list li[aria-selected="true"]{background:var(--ink);color:var(--on-ink)}
+.pal-list li[aria-selected="true"] span{color:var(--on-ink)}
+.pal-list .pal-empty{color:var(--muted);cursor:default}
+
+/* Toasts */
+.toasts{position:fixed;right:24px;bottom:24px;z-index:60;display:grid;gap:var(--s-2);justify-items:end;pointer-events:none}
+.toast{max-width:380px;background:var(--ink);color:var(--on-ink);padding:12px 16px;border-radius:var(--r-ctl);box-shadow:var(--shadow-pop);animation:toast-in 220ms var(--ease-out)}
+.toast.err{background:var(--accent)}
+.toast.out{animation:toast-out 140ms var(--ease-in) forwards}
+@keyframes toast-in{from{opacity:0;transform:translateY(8px)}}
+@keyframes toast-out{to{opacity:0;transform:translateY(8px)}}
+
+/* Janela fechada */
+.closed-note{max-width:440px;margin:18vh auto 0;text-align:center;padding:var(--s-5)}
+.closed-note h2{margin-bottom:var(--s-2)}
+.closed-note p{color:var(--muted);margin-bottom:var(--s-4)}
+
+/* ============ Responsivo: 1440 · 1024 · 768 · 375 ============ */
+@media (max-width:1100px){
+  .view{padding:var(--s-5) var(--s-6) var(--s-6)}
+  .ed-layout{grid-template-columns:88px minmax(0,1fr)}
+  .inspector{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:0 var(--s-6)}
+  .inspector .insp{flex:1 1 180px}
+  .today-grid{grid-template-columns:minmax(0,1fr) minmax(260px,320px);gap:var(--s-6)}
+  .rv{grid-template-columns:96px minmax(0,1fr) 160px}
+}
+@media (max-width:860px){
+  .today-grid,.print-grid,.prefs{grid-template-columns:1fr}
+  .app{grid-template-columns:184px minmax(0,1fr)}
+  .rv{grid-template-columns:88px minmax(0,1fr)}
+  .rv-actions{grid-column:2;display:flex;flex-wrap:wrap;align-items:center;gap:var(--s-3)}
+  .rv-sec{width:auto;grid-template-columns:auto auto;align-items:center;gap:var(--s-2)}
+}
+@media (max-width:720px){
+  .mb-apps span{visibility:hidden}
+  .kbd-hint,.traffic{display:none}
+  .tb-right{width:100%}
+  .window{width:100%;height:100dvh;min-height:0;margin:0;border:0;border-radius:0}
+  .app{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr)}
+  .side{flex-direction:row;align-items:center;padding:var(--s-2);gap:0;border-right:0;border-bottom:1px solid var(--line);overflow-x:auto;overflow-y:hidden}
+  .side nav{display:flex;gap:2px}
+  .brand,.nav-label,.side-foot{display:none}
+  .nav{display:flex;gap:2px}
+  .nav a{white-space:nowrap;min-height:44px}
+  .nav a .count{margin-left:4px}
+  .toolbar{padding:var(--s-2) var(--s-4)}
+  .tb-actions{width:100%}
+  .tb-actions .btn{flex:1;min-height:44px}
+  .view{padding:var(--s-5) var(--s-4) var(--s-6)}
+  .ed-layout{grid-template-columns:1fr;gap:var(--s-4)}
+  .thumbs{display:flex;overflow-x:auto;gap:var(--s-2)}
+  .thumb{width:64px;flex:none}
+  .stage{padding:var(--s-3)}
+  .topic{grid-template-columns:88px minmax(0,1fr) 44px}
+  .toasts{left:16px;right:16px;justify-items:stretch}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition-duration:0s!important;animation-duration:0s!important}
+  .paper-link:hover{transform:none}
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-today" viewBox="0 0 24 24"><path d="M3 18h18M6.5 18a5.5 5.5 0 0 1 11 0M12 5v2.5M5.6 9.1l1.7 1.7M18.4 9.1l-1.7 1.7"/></symbol>
+  <symbol id="i-paper" viewBox="0 0 24 24"><path d="M4 5h13v14H6a2 2 0 0 1-2-2zM17 9h3v8a2 2 0 0 1-2 2M7.5 9h6M7.5 12.5h6M7.5 16h3.5"/></symbol>
+  <symbol id="i-feed" viewBox="0 0 24 24"><path d="M5 5a14 14 0 0 1 14 14M5 11a8 8 0 0 1 8 8"/><circle cx="6" cy="18" r="1.4"/></symbol>
+  <symbol id="i-review" viewBox="0 0 24 24"><path d="M4 6h11M4 12h11M4 18h6M14.5 17.5l2 2 4-4.5"/></symbol>
+  <symbol id="i-print" viewBox="0 0 24 24"><path d="M7 9V3.5h10V9M7 17H4.5v-6.5a1.5 1.5 0 0 1 1.5-1.5h12a1.5 1.5 0 0 1 1.5 1.5V17H17M7 14h10v6.5H7z"/></symbol>
+  <symbol id="i-prefs" viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-dot" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4l9 16H3zM12 10v4.5M12 17.5v.01"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><path d="M9 6v12M15 6v12"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/><circle cx="18" cy="12" r="1.2" fill="currentColor"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24"><path d="M6 12h12"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M6 12h12M12 6v12"/></symbol>
+  <symbol id="i-ext" viewBox="0 0 24 24"><path d="M14 5h5v5M19 5l-8 8M17 14v5H5V7h5"/></symbol>
+</svg>
+
+<div class="menu" id="mb-menu" role="menu" aria-label="Morning Paper" hidden>
+  <div class="menu-head"><strong id="mb-title">Edição #142 pronta</strong><span>Enviada às 06:01 para <span data-printer-name>Office Printer</span> · próxima amanhã às <span data-time>06:00</span></span></div>
+  <div class="menu-group">
+    <button role="menuitem" data-mb="open">Abrir Morning Paper <kbd>⌘O</kbd></button>
+    <button role="menuitem" data-mb="print">Imprimir edição de hoje <kbd>⌘P</kbd></button>
+    <button role="menuitem" data-mb="generate">Gerar nova edição agora</button>
+  </div>
+  <div class="menu-group">
+    <button role="menuitem" data-mb="pause">Pausar até amanhã</button>
+    <button role="menuitem" data-mb="prefs">Preferências… <kbd>⌘,</kbd></button>
+  </div>
+  <div class="menu-group"><button role="menuitem" data-mb="quit">Sair do Morning Paper <kbd>⌘Q</kbd></button></div>
+</div>
+
+<div class="closed-note" id="closed-note" role="status" hidden>
+  <h2>Morning Paper continua trabalhando.</h2>
+  <p>A janela foi fechada, mas a próxima edição chega às 06:00.</p>
+  <button type="button" class="btn" id="reopen">Abrir a janela de novo</button>
+</div>
+
+<div class="window" id="window">
+  <div class="app">
+    <aside class="side">
+      <div class="traffic">
+        <button type="button" id="close-window" aria-label="Fechar janela"><svg class="i"><use href="#i-close"/></svg></button>
+        <span aria-hidden="true"></span><span aria-hidden="true"></span>
+      </div>
+      <div class="brand"><b>Morning<br>Paper</b><small>Seu jornal, toda manhã</small></div>
+      <nav aria-label="Principal">
+        <div class="nav-label">Ler e imprimir</div>
+        <div class="nav">
+          <a href="#hoje" data-go="hoje"><svg class="i"><use href="#i-today"/></svg>Hoje</a>
+          <a href="#edicao" data-go="edicao"><svg class="i"><use href="#i-paper"/></svg>Edição</a>
+          <a href="#revisar" data-go="revisar"><svg class="i"><use href="#i-review"/></svg>Revisar<span class="count" data-count="incl"></span></a>
+          <a href="#imprimir" data-go="imprimir"><svg class="i"><use href="#i-print"/></svg>Imprimir</a>
+        </div>
+        <div class="nav-label">Configurar</div>
+        <div class="nav">
+          <a href="#fontes" data-go="fontes"><svg class="i"><use href="#i-feed"/></svg>Fontes<span class="count" data-count="src"></span></a>
+          <a href="#preferencias" data-go="preferencias"><svg class="i"><use href="#i-prefs"/></svg>Preferências</a>
+        </div>
+      </nav>
+      <div class="side-foot"><b>Open source · v0.8.4</b>Seus dados ficam no seu Mac.</div>
+    </aside>
+
+    <main class="workspace">
+      <header class="toolbar">
+        <div class="tb-where"><b id="tb-title">Hoje</b><span id="tb-meta"></span></div>
+        <div class="tb-right">
+          <div class="tb-actions" id="tb-actions"></div>
+          <button type="button" class="kbd-hint" id="open-palette" aria-label="Abrir comandos (Command K)"><kbd>⌘K</kbd></button>
+        </div>
+      </header>
+
+      <!-- HOJE -->
+      <section class="view" id="v-hoje" aria-labelledby="h-hoje">
+        <div class="view-in">
+          <header class="view-header">
+            <p class="eyebrow">Terça-feira, 7 de outubro · Edição #142</p>
+            <h1 id="h-hoje">Seu jornal está pronto.</h1>
+            <p class="lead">As notícias importantes de ontem, organizadas para você ler com calma hoje.</p>
+          </header>
+          <div class="today-grid">
+            <div>
+              <a class="paper-link" href="#edicao" data-go="edicao" aria-label="Abrir a edição de hoje para ler">
+                <div id="today-paper"></div>
+              </a>
+              <p class="paper-hint"><span>Primeira página · clique para ler as 4 páginas</span><span data-style-label class="od-nowrap"></span></p>
+            </div>
+            <div class="today-side">
+              <section aria-labelledby="h-facts">
+                <h2 class="section-title" id="h-facts">Edição de hoje</h2>
+                <dl class="facts">
+                  <div><dt>Páginas</dt><dd>4 · A4 · preto e branco</dd></div>
+                  <div><dt>Notícias</dt><dd><span data-count="incl"></span> incluídas</dd></div>
+                  <div><dt>Fontes</dt><dd><span data-count="src"></span> ativas</dd></div>
+                  <div><dt>Assistente</dt><dd data-ai>Claude Code</dd></div>
+                  <div><dt>Impressora</dt><dd><span data-printer-name>Office Printer</span></dd></div>
+                </dl>
+              </section>
+              <section aria-labelledby="h-tl">
+                <h2 class="section-title" id="h-tl">Enquanto você dormia</h2>
+                <ol class="timeline">
+                  <li><time>05:30</time><span class="tl-mark"><svg class="i"><use href="#i-check"/></svg></span><span class="tl-text"><b>Notícias coletadas</b><span>Todas as fontes ativas foram lidas</span></span></li>
+                  <li><time>05:41</time><span class="tl-mark"><svg class="i"><use href="#i-check"/></svg></span><span class="tl-text"><b>Repetições agrupadas</b><span>A mesma notícia de várias fontes vira uma só</span></span></li>
+                  <li><time>05:52</time><span class="tl-mark"><svg class="i"><use href="#i-check"/></svg></span><span class="tl-text"><b>Edição montada</b><span>Resumos e capa no estilo <span data-style-name>Clássico</span></span></span></li>
+                  <li><time>06:00</time><span class="tl-mark"><svg class="i"><use href="#i-check"/></svg></span><span class="tl-text"><b>PDF pronto</b><span>4 páginas em A4</span></span></li>
+                  <li><time>06:01</time><span class="tl-mark"><svg class="i"><use href="#i-check"/></svg></span><span class="tl-text"><b>Enviado para impressão</b><span data-printer-name>Office Printer</span></span></li>
+                </ol>
+              </section>
+              <section class="next-block" aria-labelledby="h-next">
+                <p class="eyebrow">Amanhã</p>
+                <h3 id="h-next">A próxima edição chega às <span data-time>06:00</span>.</h3>
+                <p>Você não precisa deixar o app aberto. Ele coleta, organiza e imprime sozinho.</p>
+                <a href="#preferencias" class="btn-text" data-go="preferencias" data-focus="pref-time">Alterar horário</a>
+              </section>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- EDIÇÃO -->
+      <section class="view" id="v-edicao" aria-labelledby="h-edicao" hidden>
+        <div class="view-in">
+          <header class="view-header">
+            <p class="eyebrow" id="ed-eyebrow">Terça-feira, 7 de outubro · Edição #142</p>
+            <h1 id="h-edicao">Leia sua edição.</h1>
+            <p class="lead">Folheie como um jornal de verdade. Use as setas ← → do teclado para virar a página.</p>
+            <button type="button" class="btn-text ed-back" id="ed-back" hidden>Voltar para a edição de hoje</button>
+          </header>
+          <div class="ed-layout">
+            <nav class="thumbs" id="thumbs" aria-label="Páginas da edição"></nav>
+            <div class="stage" id="stage" tabindex="0" aria-label="Página em leitura"></div>
+            <aside class="inspector" aria-label="Controles de leitura">
+              <div class="insp">
+                <b id="pg-label">Página 1 de 4</b>
+                <div class="od-row">
+                  <button type="button" class="btn btn-sm" id="pg-prev">← Anterior</button>
+                  <button type="button" class="btn btn-sm" id="pg-next">Próxima →</button>
+                </div>
+              </div>
+              <div class="insp">
+                <div class="od-row"><label for="zoom"><b>Tamanho</b></label><output id="zoom-out" for="zoom">100%</output></div>
+                <div class="zoom-row">
+                  <button type="button" class="icon-btn" id="zoom-minus" aria-label="Diminuir"><svg class="i"><use href="#i-minus"/></svg></button>
+                  <input type="range" id="zoom" min="70" max="150" step="10" value="100">
+                  <button type="button" class="icon-btn" id="zoom-plus" aria-label="Aumentar"><svg class="i"><use href="#i-plus"/></svg></button>
+                </div>
+              </div>
+              <div class="insp">
+                <b>Estilo da edição</b>
+                <div class="od-row"><span data-style-name>Clássico</span><a href="#preferencias" class="btn-text" data-go="preferencias" data-focus="pref-style">Trocar</a></div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <!-- REVISAR -->
+      <section class="view" id="v-revisar" aria-labelledby="h-revisar" hidden>
+        <div class="view-in">
+          <header class="view-header">
+            <p class="eyebrow" id="rv-eyebrow"></p>
+            <h1 id="h-revisar">Revise antes de imprimir.</h1>
+            <p class="lead">Se algo não parece importante para você, tire da edição. Dá para trazer de volta quando quiser.</p>
+          </header>
+          <div id="rv-list"></div>
+        </div>
+      </section>
+
+      <!-- IMPRIMIR -->
+      <section class="view" id="v-imprimir" aria-labelledby="h-imprimir" hidden>
+        <div class="view-in">
+          <header class="view-header">
+            <p class="eyebrow">Tudo pronto</p>
+            <h1 id="h-imprimir">Imprima seu jornal.</h1>
+            <p class="lead">A edição de hoje está preparada em preto e branco, no tamanho A4, para gastar pouca tinta.</p>
+          </header>
+          <div class="print-grid">
+            <div class="ticket">
+              <div class="ticket-mast">Morning<br>Paper</div>
+              <dl class="facts">
+                <div><dt>Edição</dt><dd>#142 · 7 de outubro</dd></div>
+                <div><dt>Formato</dt><dd>4 páginas · A4</dd></div>
+                <div><dt>Cor</dt><dd>Preto e branco</dd></div>
+                <div><dt>Impressora</dt><dd><span data-printer-name>Office Printer</span><a href="#preferencias" class="btn-text" data-go="preferencias" data-focus="printer-pref">Alterar</a></dd></div>
+                <div><dt>Status</dt><dd id="printer-status"></dd></div>
+              </dl>
+              <fieldset>
+                <legend>Cópias</legend>
+                <div class="stepper">
+                  <button type="button" id="copies-minus" aria-label="Menos uma cópia"><svg class="i"><use href="#i-minus"/></svg></button>
+                  <output id="copies" aria-live="polite">1</output>
+                  <button type="button" id="copies-plus" aria-label="Mais uma cópia"><svg class="i"><use href="#i-plus"/></svg></button>
+                </div>
+              </fieldset>
+              <fieldset>
+                <legend>O que imprimir</legend>
+                <label class="choice"><input type="radio" name="range" value="all" checked> Todas as 4 páginas</label>
+                <label class="choice"><input type="radio" name="range" value="front"> Só a primeira página</label>
+              </fieldset>
+              <div class="msg" id="print-msg" role="status" hidden></div>
+            </div>
+            <aside aria-labelledby="h-hist">
+              <h2 class="section-title" id="h-hist">Edições anteriores</h2>
+              <ul class="history" id="history"></ul>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <!-- FONTES -->
+      <section class="view" id="v-fontes" aria-labelledby="h-fontes" hidden>
+        <div class="view-in">
+          <header class="view-header">
+            <p class="eyebrow">Sua mesa editorial</p>
+            <h1 id="h-fontes">Suas fontes</h1>
+            <p class="lead">Escolha só os lugares em que você confia. O Morning Paper lê tudo de madrugada e junta as notícias repetidas.</p>
+          </header>
+          <div class="table-wrap" id="src-table-wrap">
+            <table class="src">
+              <caption class="sr-only">Fontes de notícias</caption>
+              <thead><tr><th scope="col">Fonte</th><th scope="col">Seção</th><th scope="col">Situação</th><th scope="col" class="num">Artigos hoje</th><th scope="col">Prioridade</th><th scope="col" class="act"><span class="sr-only">Ações</span></th></tr></thead>
+              <tbody id="src-body"></tbody>
+            </table>
+          </div>
+          <div class="src-empty" id="src-empty" hidden>
+            <div class="mark" aria-hidden="true"></div>
+            <h2>Seu primeiro jornal</h2>
+            <p class="lead">Escolha algumas fontes e a sua primeira edição aparece aqui amanhã cedo.</p>
+            <button type="button" class="btn" data-open-add>Adicionar fontes</button>
+          </div>
+          <input type="file" id="opml" accept=".opml,.xml,text/xml" hidden>
+        </div>
+      </section>
+
+      <!-- PREFERÊNCIAS -->
+      <section class="view" id="v-preferencias" aria-labelledby="h-prefs" hidden>
+        <div class="view-in">
+          <header class="view-header">
+            <p class="eyebrow">Só o necessário</p>
+            <h1 id="h-prefs">Preferências</h1>
+            <p class="lead">Ajuste uma vez. Depois é só acordar e ler. Tudo é salvo automaticamente.</p>
+          </header>
+          <div class="prefs">
+            <section class="pref" aria-labelledby="h-p-ed">
+              <h2 id="h-p-ed">Edição da manhã</h2>
+              <div class="inline-select"><label for="pref-time">Gerar todos os dias às</label>
+                <select id="pref-time"><option>05:30</option><option>06:00</option><option>06:30</option><option>07:00</option><option>07:30</option></select></div>
+              <div class="field"><span class="lbl" id="len-lbl">Tamanho da edição</span>
+                <div class="seg" role="radiogroup" aria-labelledby="len-lbl">
+                  <label><input type="radio" name="len" value="2"><span>2 pág.</span></label>
+                  <label><input type="radio" name="len" value="4" checked><span>4 pág.</span></label>
+                  <label><input type="radio" name="len" value="6"><span>6 pág.</span></label>
+                  <label><input type="radio" name="len" value="8"><span>8 pág.</span></label>
+                </div>
+                <small>Vale a partir da próxima edição.</small>
+              </div>
+              <label class="check"><input type="checkbox" checked> Preparar PDF</label>
+              <label class="check"><input type="checkbox" checked> Enviar para a impressora</label>
+            </section>
+
+            <section class="pref" id="printer-pref" aria-labelledby="h-p-pr">
+              <h2 id="h-p-pr">Impressora padrão</h2>
+              <p class="note">A edição de cada manhã vai direto para ela.</p>
+              <div class="printers" role="radiogroup" aria-labelledby="h-p-pr">
+                <label><input type="radio" name="printer" value="Office Printer" data-status="Pronta" checked><span><span class="p-name">Office Printer</span><span class="p-meta">Brother HL-L2350DW · Wi-Fi · pronta</span></span></label>
+                <label><input type="radio" name="printer" value="HP LaserJet M110w" data-status="Offline"><span><span class="p-name">HP LaserJet M110w</span><span class="p-meta off">USB · desligada — ligue a impressora</span></span></label>
+                <label><input type="radio" name="printer" value="Salvar como PDF" data-status="Salva em Downloads"><span><span class="p-name">Salvar como PDF</span><span class="p-meta">Sem impressora — o arquivo fica em Downloads</span></span></label>
+              </div>
+              <label class="check"><input type="checkbox" id="ask-printer"> Perguntar qual impressora usar toda vez</label>
+              <div><button type="button" class="btn btn-sm" id="scan-printers">Procurar impressoras</button></div>
+            </section>
+
+            <section class="pref" aria-labelledby="h-p-top">
+              <h2 id="h-p-top">O que você quer ler</h2>
+              <p class="note">Ao mexer em um assunto, os outros se ajustam para somar 100%.</p>
+              <div class="topics" id="topics"></div>
+              <div class="topics-total"><span>Total</span><b id="topics-total">100%</b></div>
+            </section>
+
+            <section class="pref" aria-labelledby="h-p-st">
+              <h2 id="h-p-st">Estilo do jornal</h2>
+              <div class="styles" id="pref-style" role="radiogroup" aria-labelledby="h-p-st"></div>
+              <p class="note">A capa na tela Hoje muda na hora. A impressão continua em preto e branco.</p>
+            </section>
+
+            <section class="pref" id="background-pref" aria-labelledby="h-p-bg">
+              <h2 id="h-p-bg">Em segundo plano</h2>
+              <p class="note">O Morning Paper não precisa ficar aberto. Ele prepara e imprime a edição sozinho.</p>
+              <label class="switch-row"><span><span class="p-name">Abrir ao iniciar o Mac</span><span class="p-meta">Começa discretamente, sem abrir a janela</span></span><input type="checkbox" class="switch" id="bg-login" checked></label>
+              <label class="switch-row"><span><span class="p-name">Continuar rodando ao fechar a janela</span><span class="p-meta">Fechar a janela não interrompe a edição de amanhã</span></span><input type="checkbox" class="switch" id="bg-keep" checked></label>
+              <label class="switch-row"><span><span class="p-name">Acordar o Mac para gerar a edição</span><span class="p-meta">Se estiver em repouso, ele acorda por alguns minutos</span></span><input type="checkbox" class="switch" id="bg-wake" checked></label>
+              <label class="switch-row"><span><span class="p-name">Mostrar na barra de menus</span><span class="p-meta">Atalho para imprimir, gerar ou pausar sem abrir o app</span></span><input type="checkbox" class="switch" id="bg-menubar" checked></label>
+              <label class="switch-row"><span><span class="p-name">Ocultar do Dock</span><span class="p-meta" id="dock-note">O app fica só na barra de menus</span></span><input type="checkbox" class="switch" id="bg-dock"></label>
+            </section>
+
+            <section class="pref pref-wide" id="ai-pref" aria-labelledby="h-p-ai">
+              <h2 id="h-p-ai">Assistente para resumir</h2>
+              <p class="note">A IA é opcional. Ela junta a mesma notícia de várias fontes, escreve resumos curtos e sugere a manchete. Sem IA, o jornal usa o resumo que cada fonte publica e ordena por horário e prioridade.</p>
+              <p class="note">O Morning Paper não pede chave de API: ele usa um assistente de linha de comando já instalado e logado no seu Mac.</p>
+              <div class="agents" id="agents" role="radiogroup" aria-labelledby="h-p-ai"></div>
+              <div class="od-row agents-foot"><button type="button" class="btn btn-sm" id="scan-agents">Procurar de novo</button><span class="note" id="agents-status" role="status"></span></div>
+            </section>
+
+            <section class="pref" aria-labelledby="h-p-adv">
+              <h2 id="h-p-adv">Avançado</h2>
+              <div class="field"><label for="pref-lang">Idioma da edição</label><select id="pref-lang"><option>Português (Brasil)</option><option>English</option><option>Español</option></select></div>
+            </section>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- Adicionar fonte -->
+<dialog id="add" aria-labelledby="add-title">
+  <form class="modal" id="add-form" novalidate>
+    <div class="modal-head">
+      <div><p class="eyebrow">Uma fonte de cada vez</p><h2 id="add-title">Adicionar fonte</h2></div>
+      <button type="button" class="icon-btn" data-close aria-label="Fechar"><svg class="i"><use href="#i-close"/></svg></button>
+    </div>
+    <div class="err-summary" id="add-summary" tabindex="-1" hidden></div>
+    <div class="field">
+      <label for="f-name">Nome <span class="req" aria-hidden="true">*</span><span class="sr-only">(obrigatório)</span></label>
+      <input type="text" id="f-name" aria-describedby="f-name-err" autocomplete="off">
+      <p class="err-text" id="f-name-err" hidden></p>
+    </div>
+    <div class="field">
+      <label for="f-url">Endereço do feed (RSS) <span class="req" aria-hidden="true">*</span><span class="sr-only">(obrigatório)</span></label>
+      <input type="url" id="f-url" aria-describedby="f-url-hint f-url-err" inputmode="url" autocomplete="off">
+      <small id="f-url-hint">Exemplo: https://g1.globo.com/rss/g1/</small>
+      <p class="err-text" id="f-url-err" hidden></p>
+    </div>
+    <div class="field"><label for="f-section">Seção</label>
+      <select id="f-section"><option>Mundo</option><option>Brasil</option><option>Negócios</option><option>Tecnologia</option><option>Ciência</option><option>Cultura</option><option>Esportes</option></select></div>
+    <fieldset class="plain-fieldset">
+      <legend>Prioridade</legend>
+      <div class="prio-group">
+        <label class="choice"><input type="radio" name="f-prio" value="Alta"> Alta</label>
+        <label class="choice"><input type="radio" name="f-prio" value="Média" checked> Média</label>
+        <label class="choice"><input type="radio" name="f-prio" value="Baixa"> Baixa</label>
+      </div>
+    </fieldset>
+    <div class="modal-foot">
+      <button type="button" class="btn" data-close>Cancelar</button>
+      <button type="submit" class="btn btn-primary">Adicionar fonte</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Confirmar remoção -->
+<dialog id="confirm" aria-labelledby="confirm-title">
+  <div class="modal">
+    <div class="modal-head"><h2 id="confirm-title">Remover fonte?</h2></div>
+    <p id="confirm-text"></p>
+    <div class="modal-foot">
+      <button type="button" class="btn" data-close>Cancelar</button>
+      <button type="button" class="btn btn-danger" id="confirm-ok">Remover fonte</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- Comandos -->
+<dialog id="palette" class="palette" aria-label="Comandos">
+  <input type="text" id="pal-q" placeholder="Digite um comando…" aria-label="Buscar comando" role="combobox" aria-expanded="true" aria-controls="pal-list" aria-autocomplete="list" autocomplete="off">
+  <ul class="pal-list" id="pal-list" role="listbox" aria-label="Comandos"></ul>
+</dialog>
+
+<!-- Menu de linha (fontes) -->
+<div class="menu" id="row-menu" role="menu" hidden></div>
+
+<div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+
+<script>
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+/* ---------- Dados ---------- */
+const STYLES={classic:['Clássico','Jornal tradicional'],modern:['Moderno','Editorial contemporâneo'],financial:['Financeiro','Denso e direto'],minimal:['Minimalista','Só tipografia']};
+
+const PAGES=[
+ {section:'Capa',kicker:'O mundo, considerado',head:'Um novo mapa para um mundo em transformação',sub:'De Brasília ao espaço, as decisões que definiram o dia de ontem.',byline:'Da redação · resumo de 6 fontes',
+  lead:['Governos, empresas e pesquisadores passaram o dia de ontem revendo planos que, até pouco tempo atrás, pareciam estáveis. Em comum, a sensação de que as regras estão mudando mais depressa do que as instituições conseguem acompanhar.','Em Brasília, ministérios discutiram prazos para obras de infraestrutura e a revisão de metas para os próximos anos. Fora do país, reuniões sobre energia e comércio terminaram sem acordo fechado, mas com sinais de que as conversas continuam nas próximas semanas.','Para quem acompanha de longe, o resumo é simples: poucas decisões foram tomadas, muitas foram adiadas, e quase todas dependem de dados que ainda vão sair. É nesse intervalo que vale a pena ler com calma.','Nas próximas páginas, a edição reúne o que mudou em cada área e o que observar ao longo da semana, sem repetir a mesma notícia contada por fontes diferentes.'],
+  img:{k:'field',alt:'Ilustração em retícula de um campo ao amanhecer',cap:'Pesquisa de campo encontra novas perguntas em uma paisagem conhecida.'},
+  sideLabel:'Em resumo',
+  side:[{h:'Mercados encontram equilíbrio',p:'Os investidores observaram sinais mais claros após uma semana irregular. O detalhe importa mais do que o ruído.'},{h:'Chuvas de verão',p:'Cidades antecipam obras de drenagem e reforçam os alertas por mensagem. Página 2.'},{h:'Rotas marítimas',p:'Portos ajustam operações e empresas revisam prazos de entrega. Página 3.'},{h:'Escolas e software livre',p:'Professores trocam licenças caras por ferramentas mais simples. Página 4.'}],
+  more:[{h:'Uma estação de observação',p:['Cientistas pedem um novo olhar para o que está perto de todos nós. A proposta é acompanhar, por vários anos, mudanças pequenas que costumam passar despercebidas.','Os primeiros resultados devem ser publicados no próximo ano.']},{h:'A cultura depois da multidão',p:['Pequenos espaços e ideias independentes voltam a ganhar atenção. Salas com poucos lugares e programação curta lotam com mais frequência do que grandes eventos.','Produtores dizem que o público procura conversa, não espetáculo.']},{h:'O que os números dizem',p:['A confiança volta de forma gradual. Analistas lembram que uma semana boa não muda a tendência e pedem cautela antes de qualquer conclusão sobre o resto do ano.']},{h:'Ciência no quintal',p:['Projetos de observação de aves e de chuva reúnem voluntários em várias cidades. Os dados ajudam pesquisadores a acompanhar mudanças ao longo dos anos.']},{h:'Nesta edição',list:['Brasil · página 2','Mundo e Negócios · página 3','Tecnologia e Cultura · página 4','Agenda da semana · página 4']}],
+  briefs:[{h:'Trânsito',p:'Obras em avenidas centrais mudam o trajeto de linhas de ônibus até sexta.'},{h:'Tempo',p:'Calor durante o dia e pancadas isoladas no fim da tarde no Sudeste.'},{h:'Saúde',p:'Postos seguem com vacinação sem agendamento até o fim do mês.'},{h:'Educação',p:'Inscrições para o próximo ano letivo abrem na semana que vem.'},{h:'Economia',p:'Novos dados de inflação saem na quinta-feira.'},{h:'Esportes',p:'Rodada do fim de semana deixa a disputa do campeonato aberta.'},{h:'Cultura',p:'Bibliotecas de bairro ampliam o horário duas vezes por semana.'},{h:'Ciência',p:'Grupo de pesquisa abre chamada para voluntários na observação de aves.'},{h:'Serviço',p:'Prazo para atualizar o cadastro de alertas de chuva continua aberto.'},{h:'Amanhã',p:'A próxima edição chega às 06:00, com as notícias de hoje.'}]},
+ {section:'Brasil',kicker:'Brasil',head:'Cidades revisam planos para chuvas de verão',sub:'Prefeituras antecipam obras de drenagem e reforçam alertas por mensagem.',byline:'Brasil · resumo de 4 fontes',
+  lead:['As prefeituras das maiores cidades começaram a revisar seus planos para a temporada de chuvas antes do previsto. A ideia é concluir a limpeza de galerias e bueiros nas próximas semanas, antes das primeiras tempestades fortes.','Moradores de áreas de risco passam a receber alertas por mensagem mais cedo, com orientações simples: para onde ir, o que levar e quem procurar. O cadastro continua aberto e é gratuito.','Técnicos lembram que obra de drenagem leva tempo e que, neste ano, a prioridade são os pontos que alagaram mais de uma vez. A lista deve ser publicada pelas próprias prefeituras.','Para quem mora nesses bairros, a recomendação é conferir se o celular está cadastrado e combinar com a família um ponto de encontro.'],
+  img:{k:'city',alt:'Ilustração em retícula de prédios de uma cidade',cap:'Obras de drenagem começam antes da temporada de chuvas.'},
+  sideLabel:'Também no Brasil',
+  side:[{h:'Transporte em teste',p:'Novas linhas de ônibus funcionam em caráter experimental por três meses. Passageiros podem avaliar o serviço pelo aplicativo.'},{h:'Educação',p:'Escolas públicas abrem inscrições para o próximo ano letivo; o calendário completo sai na semana que vem.'},{h:'Saúde',p:'Campanha de vacinação segue nos postos até o fim do mês, sem necessidade de agendamento.'}],
+  more:[{h:'Bairros ganham hortas',p:['Terrenos vazios viram hortas comunitárias cuidadas por moradores. A colheita é dividida entre quem participa.']},{h:'Bibliotecas abrem à noite',p:['Unidades de bairro ampliam o horário duas vezes por semana para quem trabalha durante o dia.']},{h:'Estradas',p:['Trechos em obras devem ter desvios até o fim do mês. Vale conferir o trajeto antes de viajar.']},{h:'Tempo',p:['Semana começa abafada, com chance de pancadas no fim da tarde na maior parte do Sudeste.']}]},
+ {section:'Mundo e Negócios',kicker:'Mundo',head:'Rotas marítimas voltam ao centro do comércio',sub:'Portos ajustam operações e empresas revisam prazos de entrega.',byline:'Mundo · resumo de 5 fontes',
+  lead:['O frete marítimo voltou a ditar o ritmo do comércio. Com algumas rotas mais longas e portos operando no limite, empresas de vários países passaram a revisar prazos e estoques para o fim do ano.','Para o consumidor, o efeito costuma aparecer meses depois: produtos importados chegam mais tarde e, às vezes, mais caros. Varejistas dizem que anteciparam encomendas justamente para evitar a falta nas prateleiras.','Especialistas lembram que o setor já passou por ajustes parecidos e que a normalização tende a ser gradual. O ponto de atenção, por enquanto, é o custo do transporte.','Nas próximas semanas, novos dados de comércio devem mostrar se a mudança é passageira ou se veio para ficar.'],
+  img:{k:'sea',alt:'Ilustração em retícula do mar com o horizonte ao fundo',cap:'O frete marítimo voltou a ditar o ritmo das entregas.'},
+  sideLabel:'Negócios',
+  side:[{h:'Energia para o inverno',p:'Governos europeus avaliam estoques e pedem economia voluntária às famílias.'},{h:'Juros e inflação',p:'Continuam no centro das decisões; a próxima reunião do Copom é a data a acompanhar.'},{h:'Agro',p:'O plantio da safra avança dentro do esperado na maior parte do país.'}],
+  more:[{h:'Ásia',p:['Exportadores relatam pedidos estáveis para o fim do ano e cautela com contratos longos.']},{h:'Varejo',p:['Lojas antecipam encomendas para não depender da última hora nas datas comemorativas.']},{h:'Trabalho',p:['Empresas de logística abrem vagas temporárias para o período de fim de ano.']},{h:'Para acompanhar',p:['Dados de comércio exterior saem na próxima semana e ajudam a medir o efeito do frete.']}]},
+ {section:'Tecnologia e Cultura',kicker:'Tecnologia',head:'Programas abertos ganham espaço nas escolas',sub:'Professores trocam licenças caras por ferramentas livres e mais simples.',byline:'Tecnologia · resumo de 3 fontes',
+  lead:['Em várias redes de ensino, laboratórios de informática voltaram a ser usados depois que professores trocaram programas pagos por alternativas abertas. A economia com licenças está sendo usada para manutenção de computadores antigos.','Os professores dizem que a maior vantagem não é o preço, e sim a liberdade de instalar as ferramentas em qualquer máquina, inclusive em casa, sem depender de contas ou assinaturas.','A mudança exige treinamento, e algumas escolas criaram grupos para que quem já domina as ferramentas ensine os colegas.','O próximo passo, segundo as redes, é publicar o material de apoio para que outras escolas possam repetir a experiência.'],
+  img:{k:'desk',alt:'Ilustração em retícula de uma mesa com caderno',cap:'Laboratórios de informática voltam a ser usados.'},
+  sideLabel:'Cultura',
+  side:[{h:'Festivais de bairro',p:'Reúnem música, leitura e comida a preços acessíveis nos fins de semana.'},{h:'Privacidade',p:'Novas regras exigem explicar de forma clara como os aplicativos usam seus dados.'},{h:'Livros',p:'Feiras de rua trazem editoras pequenas e encontros com autores.'}],
+  more:[{h:'Cinco histórias para levar com você',list:['Como ler as chuvas de verão','O frete que mexe no seu preço','Dados pessoais, em linguagem simples','Escolas e software livre','A agenda cultural da semana']},{h:'Agenda da semana',p:['Sessões de cinema ao ar livre, oficinas em bibliotecas e feiras de troca de livros nos bairros.']},{h:'Dica de leitura',p:['Um bom fim de semana para retomar aquele livro parado na estante, sem pressa.']},{h:'Amanhã',p:['A próxima edição chega às 06:00, com as notícias de hoje organizadas para você.']}]}
+];
+
+const DEFAULT_SOURCES=[
+ {name:'Reuters',section:'Mundo',status:'ok',today:42,priority:'Alta'},
+ {name:'BBC News Brasil',section:'Mundo',status:'ok',today:31,priority:'Alta'},
+ {name:'Folha de S.Paulo',section:'Brasil',status:'ok',today:34,priority:'Alta'},
+ {name:'g1',section:'Brasil',status:'ok',today:38,priority:'Média'},
+ {name:'The Guardian',section:'Cultura',status:'ok',today:27,priority:'Média'},
+ {name:'TechCrunch',section:'Tecnologia',status:'ok',today:16,priority:'Média'},
+ {name:'The Verge',section:'Tecnologia',status:'paused',today:0,priority:'Baixa'},
+ {name:'Hacker News',section:'Tecnologia',status:'error',today:0,priority:'Baixa'}
+];
+const savedSources=store.get('mp-sources-v2',null);
+const SOURCES=Array.isArray(savedSources)?savedSources:DEFAULT_SOURCES.map(s=>({...s}));
+const SITES={'Reuters':'https://www.reuters.com','BBC News Brasil':'https://www.bbc.com/portuguese','Folha de S.Paulo':'https://www.folha.uol.com.br','g1':'https://g1.globo.com','The Guardian':'https://www.theguardian.com','TechCrunch':'https://techcrunch.com','The Verge':'https://www.theverge.com','Hacker News':'https://news.ycombinator.com'};
+const SECTIONS=['Mundo','Brasil','Negócios','Tecnologia','Ciência','Cultura','Esportes'];
+
+const ARTICLES=[
+ {id:1,section:'Mundo',source:'Reuters',time:'05:12',imp:'alta',img:'field',alt:'Ilustração de campo',title:'Um novo mapa para um mundo em transformação',sum:'Governos e pesquisadores mudam a maneira como o público entende uma transição global importante.',inc:true,head:true},
+ {id:2,section:'Negócios',source:'Folha de S.Paulo',time:'05:20',imp:'média',img:'sea',alt:'Ilustração de mar',title:'Mercados encontram equilíbrio após uma semana cautelosa',sum:'O que os sinais de ontem sugerem para as próximas semanas, reunido de seis fontes.',inc:true},
+ {id:3,section:'Brasil',source:'g1',time:'04:58',imp:'alta',img:'city',alt:'Ilustração de cidade',title:'Cidades revisam planos para chuvas de verão',sum:'Prefeituras antecipam obras de drenagem e reforçam os alertas por mensagem.',inc:true},
+ {id:4,section:'Mundo',source:'BBC News Brasil',time:'05:03',imp:'média',img:'sea',alt:'Ilustração de mar',title:'Rotas marítimas voltam ao centro do comércio',sum:'Portos ajustam operações e empresas revisam prazos de entrega.',inc:true},
+ {id:5,section:'Tecnologia',source:'TechCrunch',time:'05:25',imp:'média',img:'desk',alt:'Ilustração de mesa',title:'Programas abertos ganham espaço nas escolas',sum:'Professores trocam licenças caras por ferramentas livres e mais simples.',inc:true},
+ {id:6,section:'Cultura',source:'The Guardian',time:'05:31',imp:'baixa',img:'city',alt:'Ilustração de cidade',title:'A cultura depois da multidão',sum:'Pequenos espaços e ideias independentes voltam a ganhar atenção.',inc:true},
+ {id:7,section:'Esportes',source:'g1',time:'05:36',imp:'baixa',img:'field',alt:'Ilustração de campo',title:'Rodada do fim de semana muda a tabela',sum:'Resultados apertados deixam a disputa aberta até as últimas rodadas.',inc:false},
+ {id:8,section:'Tecnologia',source:'TechCrunch',time:'05:40',imp:'baixa',img:'desk',alt:'Ilustração de mesa',title:'Mais um aplicativo promete mudar sua rotina',sum:'Lançamento com pouca novidade em relação ao que já existe.',inc:false}
+];
+
+const DEFAULT_TOPICS=[{n:'Brasil',v:25},{n:'Mundo',v:20},{n:'Tecnologia',v:20},{n:'Negócios',v:15},{n:'Ciência',v:10},{n:'Esportes',v:5},{n:'Cultura',v:5}];
+const savedTopics=store.get('mp-topics',null);
+const TOPICS=Array.isArray(savedTopics)&&savedTopics.length===DEFAULT_TOPICS.length?savedTopics:DEFAULT_TOPICS.map(t=>({...t}));
+
+const HISTORY=[{n:141,d:'Segunda-feira, 6 de outubro',short:'Seg · 6 out. · 2026',p:4},{n:140,d:'Domingo, 5 de outubro',short:'Dom · 5 out. · 2026',p:6},{n:139,d:'Sábado, 4 de outubro',short:'Sáb · 4 out. · 2026',p:4},{n:138,d:'Sexta-feira, 3 de outubro',short:'Sex · 3 out. · 2026',p:4}];
+
+const TODAY={n:142,label:'Ter · 7 out. · 2026',long:'Terça-feira, 7 de outubro'};
+const savedStyle=store.get('mp-style','classic');
+const state={view:'hoje',page:0,zoom:1,style:STYLES[savedStyle]?savedStyle:'classic',edition:{...TODAY},copies:1,paused:false};
+
+/* ---------- Utilidades ---------- */
+const included=()=>ARTICLES.filter(a=>a.inc).length;
+const activeSources=()=>SOURCES.filter(s=>s.status!=='paused').length;
+function currentPrinter(){const r=$('input[name="printer"]:checked');return {name:r.value,status:r.dataset.status}}
+function toast(msg,tone){const t=document.createElement('div');t.className='toast'+(tone?' '+tone:'');t.textContent=msg;$('#toasts').appendChild(t);setTimeout(()=>{t.classList.add('out');setTimeout(()=>t.remove(),160)},3600)}
+function updateCounts(){$$('[data-count="incl"]').forEach(e=>e.textContent=included());$$('[data-count="src"]').forEach(e=>e.textContent=activeSources())}
+
+/* ---------- Página de jornal ---------- */
+function storyHTML(s){
+  if(s.list)return `<section class="np-story"><h3>${s.h}</h3><ol class="np-list">${s.list.map(x=>`<li>${x}</li>`).join('')}</ol></section>`;
+  const ps=Array.isArray(s.p)?s.p:[s.p];
+  return `<section class="np-story"><h3>${s.h}</h3>${ps.map(x=>`<p>${x}</p>`).join('')}</section>`;
+}
+function pageHTML(i){
+  const p=PAGES[i],ed=state.edition,num=String(i+1).padStart(2,'0');
+  const top=i===0
+    ?`<header class="np-mast"><span class="np-ear"><span>Seu jornal particular</span><span>Preto e branco · A4</span></span><b>Morning Paper</b><span class="np-ear np-ear-r"><span>Edição ${ed.n}</span><span>${PAGES.length} páginas</span></span></header><p class="np-dateline"><span>${ed.long}</span><span>Notícias de ontem, lidas com calma</span></p>`
+    :`<header class="np-sechead"><b>Morning Paper</b><span>${p.section}</span></header><p class="np-dateline"><span>${ed.long}</span><span>Edição ${ed.n} · página ${i+1}</span></p>`;
+  const briefs=p.briefs?`<section class="np-briefs"><p class="np-briefs-label">Curtas</p><div class="np-briefs-grid">${p.briefs.map(b=>`<p><b>${b.h}.</b> ${b.p}</p>`).join('')}</div></section>`:'';
+  return `<article class="page${i===0?' np-front':''}" data-style="${state.style}" aria-label="Página ${i+1} de ${PAGES.length}: ${p.section}"><div class="page-in">${top}<div class="np-lead"><div class="np-lead-main"><p class="np-kicker">${esc(p.kicker)}</p><h2 class="np-head">${esc(p.head)}</h2><p class="np-sub">${p.sub}</p><p class="np-byline">${p.byline}</p><figure class="np-fig"><div class="np-img np-img--${p.img.k}" role="img" aria-label="${p.img.alt}"></div><figcaption class="np-cap">${p.img.cap}</figcaption></figure><div class="np-text">${p.lead.map(x=>`<p>${x}</p>`).join('')}</div></div><aside class="np-side"><p class="np-side-label">${p.sideLabel}</p>${p.side.map(storyHTML).join('')}</aside></div><div class="np-more">${p.more.map(storyHTML).join('')}</div>${briefs}<footer class="np-foot"><span>Morning Paper · sua edição particular</span><span>${num}</span></footer></div></article>`;
+}
+function renderStyleLabels(){$$('[data-style-name]').forEach(e=>e.textContent=STYLES[state.style][0]);$$('[data-style-label]').forEach(e=>e.textContent='Estilo '+STYLES[state.style][0])}
+function renderToday(){const ed=state.edition;state.edition={...TODAY};$('#today-paper').innerHTML=pageHTML(0);state.edition=ed;renderStyleLabels()}
+
+/* ---------- Edição ---------- */
+function renderEdition(){
+  const ed=state.edition,isToday=ed.n===TODAY.n;
+  $('#ed-eyebrow').textContent=`${ed.long} · Edição #${ed.n}`;
+  $('#ed-back').hidden=isToday;
+  $('#thumbs').innerHTML=PAGES.map((p,i)=>`<button type="button" class="thumb" data-page="${i}" aria-current="${i===state.page}" aria-label="Página ${i+1}: ${p.section}"><b>${String(i+1).padStart(2,'0')}</b><span>${p.section}</span><i></i></button>`).join('');
+  $('#stage').innerHTML=pageHTML(state.page);
+  $('#stage').style.setProperty('--zoom',state.zoom);
+  $('#pg-label').textContent=`Página ${state.page+1} de ${PAGES.length}`;
+  $('#pg-prev').disabled=state.page===0;$('#pg-next').disabled=state.page===PAGES.length-1;
+  const z=Math.round(state.zoom*100);$('#zoom').value=z;$('#zoom-out').textContent=z+'%';
+  $('#zoom-minus').disabled=z<=70;$('#zoom-plus').disabled=z>=150;
+  renderStyleLabels();
+}
+function setPage(i){const n=Math.max(0,Math.min(PAGES.length-1,i));if(n===state.page)return;state.page=n;renderEdition();renderToolbar();$('#stage').scrollTo({top:0,left:0})}
+function setZoom(z){state.zoom=Math.max(.7,Math.min(1.5,Math.round(z*10)/10));renderEdition()}
+$('#thumbs').addEventListener('click',e=>{const b=e.target.closest('[data-page]');if(b){setPage(+b.dataset.page);$(`.thumb[data-page="${b.dataset.page}"]`).focus()}});
+$('#pg-prev').addEventListener('click',()=>{setPage(state.page-1);if($('#pg-prev').disabled)$('#pg-next').focus()});
+$('#pg-next').addEventListener('click',()=>{setPage(state.page+1);if($('#pg-next').disabled)$('#pg-prev').focus()});
+$('#zoom').addEventListener('input',e=>{state.zoom=e.target.value/100;$('#stage').style.setProperty('--zoom',state.zoom);$('#zoom-out').textContent=e.target.value+'%';$('#zoom-minus').disabled=+e.target.value<=70;$('#zoom-plus').disabled=+e.target.value>=150});
+$('#zoom-minus').addEventListener('click',()=>setZoom(state.zoom-.1));
+$('#zoom-plus').addEventListener('click',()=>setZoom(state.zoom+.1));
+$('#stage').addEventListener('keydown',e=>{if(e.key==='ArrowRight'){e.preventDefault();setPage(state.page+1)}if(e.key==='ArrowLeft'){e.preventDefault();setPage(state.page-1)}});
+$('#ed-back').addEventListener('click',()=>{state.edition={...TODAY};state.page=0;renderEdition();renderToolbar();$('#h-edicao').focus()});
+
+/* ---------- Fontes ---------- */
+function statusHTML(s){
+  if(s.status==='ok')return `<span class="st st-ok"><svg class="i"><use href="#i-dot"/></svg>Conectada</span>`;
+  if(s.status==='new')return `<span class="st st-muted"><svg class="i"><use href="#i-dot"/></svg>Primeira leitura amanhã</span>`;
+  if(s.status==='paused')return `<span class="st st-muted"><svg class="i"><use href="#i-pause"/></svg>Pausada</span>`;
+  return `<span class="st st-err"><svg class="i"><use href="#i-alert"/></svg>Sem resposta desde 04:10</span>`;
+}
+function renderSources(){
+  $('#src-body').innerHTML=SOURCES.map((s,i)=>`<tr class="is-${s.status}"><th scope="row">${esc(s.name)}</th><td>${esc(s.section)}</td><td>${statusHTML(s)}</td><td class="num">${s.status==='ok'?s.today:'—'}</td><td><span class="prio" data-p="${s.priority}">${s.priority}</span></td><td class="act"><button type="button" class="icon-btn" data-menu="${i}" aria-haspopup="menu" aria-expanded="false" aria-label="Opções para ${esc(s.name)}"><svg class="i"><use href="#i-more"/></svg></button></td></tr>`).join('');
+  const empty=SOURCES.length===0;$('#src-table-wrap').hidden=empty;$('#src-empty').hidden=!empty;
+  store.set('mp-sources-v2',SOURCES);updateCounts();
+}
+const rowMenu=$('#row-menu');let rowMenuBtn=null;
+function closeRowMenu(){if(rowMenu.hidden)return;rowMenu.hidden=true;rowMenuBtn?.setAttribute('aria-expanded','false')}
+function openRowMenu(btn){
+  const i=+btn.dataset.menu,s=SOURCES[i];rowMenuBtn=btn;
+  rowMenu.setAttribute('aria-label','Opções para '+s.name);
+  rowMenu.innerHTML=`<div class="menu-label">Prioridade</div>${['Alta','Média','Baixa'].map(p=>`<button role="menuitemradio" aria-checked="${s.priority===p}" data-prio="${p}">${p}</button>`).join('')}
+  <div class="menu-group"><button role="menuitem" data-row="toggle">${s.status==='paused'?'Retomar fonte':'Pausar fonte'}</button>${SITES[s.name]?`<button role="menuitem" data-row="site">Abrir site <svg class="i" aria-hidden="true"><use href="#i-ext"/></svg></button>`:''}</div>
+  <div class="menu-group"><button role="menuitem" class="is-danger" data-row="remove">Remover fonte…</button></div>`;
+  rowMenu.dataset.i=i;rowMenu.hidden=false;
+  const r=btn.getBoundingClientRect(),w=rowMenu.offsetWidth,h=rowMenu.offsetHeight;
+  rowMenu.style.left=Math.max(8,r.right-w)+'px';
+  rowMenu.style.top=(r.bottom+4+h>innerHeight?Math.max(8,r.top-4-h):r.bottom+4)+'px';
+  btn.setAttribute('aria-expanded','true');rowMenu.querySelector('[role^="menuitem"]').focus();
+}
+$('#src-body').addEventListener('click',e=>{const b=e.target.closest('[data-menu]');if(!b)return;e.stopPropagation();if(!rowMenu.hidden&&rowMenuBtn===b){closeRowMenu();return}closeRowMenu();openRowMenu(b)});
+rowMenu.addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  const i=+rowMenu.dataset.i,s=SOURCES[i];
+  if(b.dataset.prio){s.priority=b.dataset.prio;closeRowMenu();renderSources();$(`[data-menu="${i}"]`)?.focus();toast(`${s.name}: prioridade ${s.priority.toLowerCase()}.`);return}
+  const a=b.dataset.row;closeRowMenu();
+  if(a==='toggle'){s.status=s.status==='paused'?'ok':'paused';renderSources();renderToolbar();$(`[data-menu="${i}"]`)?.focus();toast(s.status==='paused'?`${s.name} pausada. Ela não entra nas próximas edições.`:`${s.name} voltou para a edição.`)}
+  if(a==='site'){window.open(SITES[s.name],'_blank','noopener');rowMenuBtn?.focus()}
+  if(a==='remove'){$('#confirm-title').textContent=`Remover ${s.name}?`;$('#confirm-text').textContent=`As notícias de ${s.name} deixam de entrar nas próximas edições. Você pode adicionar de novo quando quiser.`;$('#confirm-ok').dataset.i=i;$('#confirm').showModal()}
+});
+$('#confirm-ok').addEventListener('click',e=>{const i=+e.currentTarget.dataset.i,n=SOURCES[i].name;SOURCES.splice(i,1);$('#confirm').close();renderSources();renderToolbar();(SOURCES.length?$(`[data-menu="${Math.min(i,SOURCES.length-1)}"]`):$('[data-open-add]'))?.focus();toast(`${n} foi removida.`)});
+
+/* Importar OPML (arquivo exportado de leitores de RSS) */
+$('#opml').addEventListener('change',e=>{
+  const f=e.target.files[0];if(!f)return;const rd=new FileReader();
+  rd.onload=()=>{let added=0;try{const doc=new DOMParser().parseFromString(rd.result,'text/xml');doc.querySelectorAll('outline[xmlUrl]').forEach(o=>{const name=o.getAttribute('title')||o.getAttribute('text')||o.getAttribute('xmlUrl');if(!SOURCES.some(s=>s.name===name)){SOURCES.push({name,section:'Mundo',status:'new',today:0,priority:'Média'});added++}})}catch(err){}
+    renderSources();renderToolbar();toast(added?`${added} fonte${added>1?'s':''} importada${added>1?'s':''} de ${f.name}.`:`Nenhum feed novo encontrado em ${f.name}.`,added?'':'err');e.target.value=''};
+  rd.readAsText(f);
+});
+
+/* Adicionar fonte — validação ao sair do campo */
+const addDlg=$('#add'),addForm=$('#add-form');
+const RULES={
+  'f-name':v=>v.trim()?'':'Escreva o nome da fonte, por exemplo “Folha de S.Paulo”.',
+  'f-url':v=>!v.trim()?'Cole o endereço do feed RSS.':/^https?:\/\/[^\s.]+\.[^\s]+$/i.test(v.trim())?'':'O endereço precisa começar com https:// — confira se copiou o link inteiro.'
+};
+function validate(id){const el=$('#'+id),msg=RULES[id](el.value),err=$('#'+id+'-err');err.hidden=!msg;err.textContent=msg;msg?el.setAttribute('aria-invalid','true'):el.removeAttribute('aria-invalid');return msg}
+Object.keys(RULES).forEach(id=>{const el=$('#'+id);el.addEventListener('blur',()=>{if(el.value||el.getAttribute('aria-invalid'))validate(id)});el.addEventListener('input',()=>{if(el.getAttribute('aria-invalid'))validate(id)})});
+function openAdd(){addForm.reset();Object.keys(RULES).forEach(id=>{$('#'+id).removeAttribute('aria-invalid');$('#'+id+'-err').hidden=true});$('#add-summary').hidden=true;addDlg.showModal();$('#f-name').focus()}
+addForm.addEventListener('submit',e=>{
+  e.preventDefault();
+  const errs=Object.keys(RULES).map(id=>[id,validate(id)]).filter(x=>x[1]);
+  const sum=$('#add-summary');
+  if(errs.length){sum.innerHTML=`<b>${errs.length>1?'Faltam 2 informações':'Falta 1 informação'}:</b><ul>${errs.map(([id,m])=>`<li><a href="#${id}" data-field="${id}">${esc(m)}</a></li>`).join('')}</ul>`;sum.hidden=false;sum.focus();return}
+  const name=$('#f-name').value.trim();
+  SOURCES.push({name,section:$('#f-section').value,status:'new',today:0,priority:$('input[name="f-prio"]:checked').value});
+  addDlg.close();renderSources();renderToolbar();toast(`${name} adicionada. A primeira leitura acontece amanhã cedo.`);
+});
+$('#add-summary').addEventListener('click',e=>{const a=e.target.closest('[data-field]');if(a){e.preventDefault();$('#'+a.dataset.field).focus()}});
+$$('[data-close]').forEach(b=>b.addEventListener('click',()=>{const d=b.closest('dialog');d.close();if(d.id==='confirm')rowMenuBtn?.focus()}));
+document.addEventListener('click',e=>{if(e.target.closest('[data-open-add]'))openAdd()});
+
+/* ---------- Revisar ---------- */
+function renderReview(){
+  $('#rv-eyebrow').textContent=`${included()} de ${ARTICLES.length} notícias na edição`;
+  $('#rv-list').innerHTML=ARTICLES.map(a=>`<article class="rv ${a.inc?'':'is-out'}" data-id="${a.id}" aria-labelledby="rv-t-${a.id}">
+    <div class="rv-thumb np-img np-img--${a.img}" role="img" aria-label="${a.alt}"></div>
+    <div>
+      <p class="rv-meta">${a.section} · ${esc(a.source)} · <span class="od-nowrap">${a.time}</span> · importância ${a.imp}</p>
+      ${a.head?'<p class="rv-badge">Manchete da capa</p>':''}
+      <h3 id="rv-t-${a.id}">${esc(a.title)}</h3>
+      <div class="rv-sum">${a.editing?`<label class="sr-only" for="sum-${a.id}">Resumo de “${esc(a.title)}”</label><textarea id="sum-${a.id}">${esc(a.sum)}</textarea><div class="rv-edit-actions"><button type="button" class="btn btn-sm" data-act="save">Salvar resumo</button><button type="button" class="btn-text" data-act="cancel">Cancelar</button></div>`:`<p>${esc(a.sum)}</p>`}</div>
+      ${SITES[a.source]?`<a class="rv-link" href="${SITES[a.source]}" target="_blank" rel="noopener">Abrir em ${esc(a.source)} ↗</a>`:''}
+    </div>
+    <div class="rv-actions">
+      <p class="rv-state ${a.inc?'on':'off'}">${a.inc?'<svg class="i"><use href="#i-check"/></svg>Na edição':'Fora da edição'}</p>
+      <button type="button" class="btn btn-sm" data-act="toggle" ${a.head?'disabled aria-describedby="rv-head-note"':''}>${a.inc?'Tirar da edição':'Colocar de volta'}</button>
+      ${a.head?'<p class="note" id="rv-head-note">A manchete não pode sair. Escolha outra antes.</p>':''}
+      <button type="button" class="btn-text" data-act="edit" ${a.editing?'disabled':''}>Editar resumo</button>
+      <button type="button" class="btn-text" data-act="head" ${a.head||!a.inc?'disabled':''}>Virar manchete</button>
+      <label class="rv-sec"><span>Seção</span><select data-act="section">${SECTIONS.map(s=>`<option ${s===a.section?'selected':''}>${s}</option>`).join('')}</select></label>
+    </div></article>`).join('');
+  updateCounts();
+}
+$('#rv-list').addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]');if(!b||b.tagName==='SELECT')return;
+  const a=ARTICLES.find(x=>x.id===+b.closest('.rv').dataset.id),act=b.dataset.act;
+  if(act==='toggle'){a.inc=!a.inc;toast(a.inc?'Notícia de volta na edição.':'Notícia tirada da edição.')}
+  if(act==='edit')a.editing=true;
+  if(act==='cancel')a.editing=false;
+  if(act==='save'){a.sum=$('#sum-'+a.id).value.trim()||a.sum;a.editing=false;toast('Resumo salvo.')}
+  if(act==='head'){ARTICLES.forEach(x=>x.head=false);a.head=true;PAGES[0].head=a.title;PAGES[0].kicker=a.section;renderToday();toast('Nova manchete na capa.')}
+  renderReview();renderToolbar();
+  const card=$(`.rv[data-id="${a.id}"]`);
+  if(act==='edit'){$('#sum-'+a.id).focus();return}
+  const want=card.querySelector(`[data-act="${act==='save'||act==='cancel'?'edit':act}"]`);
+  (want&&!want.disabled?want:card.querySelector('select'))?.focus();
+});
+$('#rv-list').addEventListener('change',e=>{if(e.target.dataset.act!=='section')return;const id=+e.target.closest('.rv').dataset.id,a=ARTICLES.find(x=>x.id===id);a.section=e.target.value;renderReview();$(`.rv[data-id="${id}"] select`).focus();toast(`Movida para ${a.section}.`)});
+
+/* ---------- Imprimir ---------- */
+function renderPrint(){
+  const p=currentPrinter();
+  $('#printer-status').innerHTML=p.status==='Offline'?`<span class="st st-err"><svg class="i"><use href="#i-alert"/></svg>Desligada</span>`:`<span class="st st-ok"><svg class="i"><use href="#i-dot"/></svg>${p.status}</span>`;
+  $('#copies').textContent=state.copies;$('#copies-minus').disabled=state.copies<=1;$('#copies-plus').disabled=state.copies>=5;
+  $('#history').innerHTML=HISTORY.map(h=>`<li><button type="button" data-ed="${h.n}"><b>${h.d}</b><span>#${h.n} · ${h.p} páginas →</span></button></li>`).join('');
+}
+$('#copies-minus').addEventListener('click',()=>{state.copies--;renderPrint();if($('#copies-minus').disabled)$('#copies-plus').focus()});
+$('#copies-plus').addEventListener('click',()=>{state.copies++;renderPrint();if($('#copies-plus').disabled)$('#copies-minus').focus()});
+$('#history').addEventListener('click',e=>{const b=e.target.closest('[data-ed]');if(!b)return;const h=HISTORY.find(x=>x.n===+b.dataset.ed);state.edition={n:h.n,long:h.d,label:h.short};state.page=0;go('edicao')});
+let printTimer=null;
+function printNow(){
+  if(state.view!=='imprimir')go('imprimir');
+  const b=$('#print-now');if(!b||printTimer)return;
+  const p=currentPrinter(),msg=$('#print-msg');
+  b.disabled=true;b.setAttribute('aria-busy','true');b.textContent='Enviando…';msg.hidden=true;
+  printTimer=setTimeout(()=>{
+    printTimer=null;
+    const btn=$('#print-now');if(btn){btn.disabled=false;btn.removeAttribute('aria-busy');btn.textContent='Imprimir agora'}
+    msg.hidden=false;
+    const pages=$('input[name="range"]:checked').value==='front'?'só a primeira página':'4 páginas';
+    if(p.status==='Offline'){msg.className='msg err';msg.innerHTML=`<svg class="i"><use href="#i-alert"/></svg><span>A ${esc(p.name)} está desligada. Ligue a impressora e tente de novo, ou <a href="#preferencias" data-go="preferencias" data-focus="printer-pref" class="btn-text" style="color:inherit;font-size:inherit">escolha outra</a>.</span>`;toast('Não foi possível imprimir.','err')}
+    else if(p.name==='Salvar como PDF'){msg.className='msg ok';msg.innerHTML=`<svg class="i"><use href="#i-check"/></svg><span>PDF salvo em Downloads: morning-paper-${state.edition.n}.pdf</span>`;toast('PDF salvo em Downloads.')}
+    else{msg.className='msg ok';msg.innerHTML=`<svg class="i"><use href="#i-check"/></svg><span>Enviado para ${esc(p.name)}: ${state.copies} cópia${state.copies>1?'s':''}, ${pages}.</span>`;toast(`Imprimindo na ${p.name}.`)}
+  },1200);
+}
+function savePdf(){toast(`PDF salvo em Downloads: morning-paper-${state.edition.n}.pdf`)}
+function importRss(){$('#opml').click()}
+
+/* ---------- Toolbar + navegação ---------- */
+const VIEWS={
+  hoje:{t:'Hoje',meta:()=>`Edição #${TODAY.n} · pronta · ${included()} notícias`,a:[['Revisar notícias',()=>go('revisar')],['Imprimir jornal',()=>go('imprimir'),1]]},
+  edicao:{t:'Edição',meta:()=>`#${state.edition.n} · página ${state.page+1} de ${PAGES.length} · estilo ${STYLES[state.style][0]}`,a:[['Baixar PDF',savePdf],['Imprimir',()=>go('imprimir'),1]]},
+  revisar:{t:'Revisar',meta:()=>`${included()} de ${ARTICLES.length} notícias na edição`,a:[['Ver edição final',()=>{state.edition={...TODAY};state.page=0;go('edicao')},1]]},
+  imprimir:{t:'Imprimir',meta:()=>{const p=currentPrinter();return `${p.name} · ${p.status==='Offline'?'desligada':p.status.toLowerCase()}`},a:[['Salvar PDF',savePdf],['Imprimir agora',printNow,1,'print-now']]},
+  fontes:{t:'Fontes',meta:()=>`${activeSources()} ativas de ${SOURCES.length}`,a:[['Importar OPML',importRss],['Adicionar fonte',openAdd,1]]},
+  preferencias:{t:'Preferências',meta:()=>'Salvas automaticamente',a:[]}
+};
+function renderToolbar(){
+  const v=VIEWS[state.view];$('#tb-title').textContent=v.t;$('#tb-meta').textContent=v.meta();
+  if(printTimer&&state.view==='imprimir')return;
+  const box=$('#tb-actions');box.innerHTML='';
+  v.a.forEach(([label,fn,primary,id])=>{const b=document.createElement('button');b.type='button';b.className='btn'+(primary?' btn-primary':'');b.textContent=label;if(id)b.id=id;b.addEventListener('click',fn);box.appendChild(b)});
+}
+const RENDER={hoje:renderToday,edicao:renderEdition,revisar:renderReview,imprimir:renderPrint,fontes:renderSources,preferencias:()=>{}};
+function go(id,opt={}){
+  if(!VIEWS[id])id='hoje';
+  closeRowMenu();mbSet(false);
+  state.view=id;
+  $$('.view').forEach(v=>v.hidden=v.id!=='v-'+id);
+  $$('.nav [data-go]').forEach(a=>a.dataset.go===id?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current'));
+  if(opt.push!==false&&location.hash!=='#'+id)history.pushState({v:id},'','#'+id);
+  RENDER[id]();renderToolbar();
+  const view=$('#v-'+id);view.scrollTop=0;
+  if(opt.focus){const t=document.getElementById(opt.focus);if(t){view.scrollTop+=t.getBoundingClientRect().top-view.getBoundingClientRect().top-24;const f=t.matches('input,select,button')?t:t.querySelector('input:checked,select,input,button');f&&f.focus({preventScroll:true})}}
+}
+document.addEventListener('click',e=>{const t=e.target.closest('[data-go]');if(t){e.preventDefault();go(t.dataset.go,{focus:t.dataset.focus})}});
+addEventListener('popstate',()=>go(location.hash.slice(1)||'hoje',{push:false}));
+
+/* ---------- Preferências ---------- */
+const printerRadios=$$('input[name="printer"]');
+function applyPrinter(){const p=currentPrinter();$$('[data-printer-name]').forEach(e=>e.textContent=p.name);store.set('mp-printer',p.name);if(state.view==='imprimir'){renderPrint();renderToolbar()}}
+const savedPrinter=store.get('mp-printer',null);
+printerRadios.forEach(r=>{if(r.value===savedPrinter)r.checked=true;r.addEventListener('change',()=>{applyPrinter();toast(`Impressora padrão: ${r.value}.`)})});
+const scan=$('#scan-printers');
+scan.addEventListener('click',()=>{scan.disabled=true;scan.textContent='Procurando…';setTimeout(()=>{scan.disabled=false;scan.textContent='Procurar impressoras';scan.focus();toast('Nenhuma impressora nova encontrada na rede.')},1200)});
+
+const timeSel=$('#pref-time');
+timeSel.value=store.get('mp-time','06:00');if(!timeSel.value)timeSel.value='06:00';
+function applyTime(){$$('[data-time]').forEach(e=>e.textContent=timeSel.value);store.set('mp-time',timeSel.value)}
+timeSel.addEventListener('change',()=>{applyTime();toast(`Próximas edições às ${timeSel.value}.`)});
+$$('input[name="len"]').forEach(r=>r.addEventListener('change',()=>toast(`A partir de amanhã: ${r.value} páginas.`)));
+/* Assistentes de IA: detecta CLIs instalados no PATH (no app real: `which <cmd>` + `<cmd> --version`) */
+const AGENTS=[
+  {id:'claude',name:'Claude Code',cmd:'claude',path:'/opt/homebrew/bin/claude',found:true,note:'Usa a sua conta do Claude'},
+  {id:'codex',name:'Codex CLI',cmd:'codex',path:'/usr/local/bin/codex',found:true,note:'Usa a sua conta da OpenAI'},
+  {id:'gemini',name:'Gemini CLI',cmd:'gemini',path:null,found:false,note:'Usa a sua conta do Google'},
+  {id:'ollama',name:'Ollama',cmd:'ollama',path:'/usr/local/bin/ollama',found:true,note:'Roda no seu Mac, sem enviar dados'},
+  {id:'opencode',name:'OpenCode',cmd:'opencode',path:null,found:false,note:'Usa o provedor configurado nele'},
+  {id:'none',name:'Sem IA',cmd:null,path:null,found:true,note:'Usa o resumo de cada fonte'}
+];
+let agentSel=store.get('mp-agent','claude');
+if(!AGENTS.some(a=>a.id===agentSel&&a.found))agentSel='claude';
+function renderAgents(){
+  $('#agents').innerHTML=AGENTS.map(a=>`<label class="agent"><input type="radio" name="agent" value="${a.id}" ${a.id===agentSel?'checked':''} ${a.found?'':'disabled'} aria-describedby="ag-${a.id}"><b>${a.name}</b>${a.cmd?`<code>${a.found?a.path:a.cmd+' não está no PATH'}</code>`:''}<small id="ag-${a.id}">${a.found?a.note:'Não encontrado neste Mac. Instale e clique em Procurar de novo.'}</small>${a.cmd?(a.found?'<span class="st st-ok"><svg class="i"><use href="#i-check"/></svg>Encontrado</span>':'<span class="st st-muted"><svg class="i"><use href="#i-dot"/></svg>Não instalado</span>'):''}</label>`).join('');
+  const n=AGENTS.filter(a=>a.cmd&&a.found).length;
+  $('#agents-status').textContent=`${n} assistente${n>1?'s':''} encontrado${n>1?'s':''} neste Mac.`;
+  $$('[data-ai]').forEach(x=>x.textContent=AGENTS.find(a=>a.id===agentSel).name);
+}
+$('#agents').addEventListener('change',e=>{agentSel=e.target.value;store.set('mp-agent',agentSel);renderAgents();$(`input[name="agent"][value="${agentSel}"]`).focus();const a=AGENTS.find(x=>x.id===agentSel);toast(a.id==='none'?'Sem IA: o jornal vai usar o resumo de cada fonte.':`A próxima edição será resumida pelo ${a.name}.`)});
+const scanAg=$('#scan-agents');
+scanAg.addEventListener('click',()=>{scanAg.disabled=true;scanAg.textContent='Procurando…';$('#agents-status').textContent='Procurando assistentes instalados…';setTimeout(()=>{scanAg.disabled=false;scanAg.textContent='Procurar de novo';renderAgents();scanAg.focus()},1200)});
+renderAgents();
+
+/* Assuntos — sempre somam 100% */
+function renderTopics(){
+  $('#topics').innerHTML=TOPICS.map((t,i)=>`<div class="topic"><label for="tp-${i}">${t.n}</label><input type="range" id="tp-${i}" min="0" max="100" step="5" value="${t.v}" data-i="${i}" aria-valuetext="${t.v}%"><output for="tp-${i}" id="tpo-${i}">${t.v}%</output></div>`).join('');
+}
+function setTopic(i,v){
+  const others=TOPICS.map((_,j)=>j).filter(j=>j!==i),S=others.reduce((s,j)=>s+TOPICS[j].v,0),R=100-v;
+  others.forEach(j=>TOPICS[j].v=S?Math.round(TOPICS[j].v*R/S):Math.round(R/others.length));
+  TOPICS[i].v=v;
+  const diff=100-TOPICS.reduce((s,t)=>s+t.v,0);
+  if(diff){const j=others.reduce((a,b)=>TOPICS[b].v>TOPICS[a].v?b:a);TOPICS[j].v=Math.max(0,TOPICS[j].v+diff)}
+  TOPICS.forEach((t,j)=>{const r=$('#tp-'+j);if(j!==i)r.value=t.v;r.setAttribute('aria-valuetext',t.v+'%');$('#tpo-'+j).textContent=t.v+'%'});
+  $('#topics-total').textContent=TOPICS.reduce((s,t)=>s+t.v,0)+'%';
+  store.set('mp-topics',TOPICS);
+}
+$('#topics').addEventListener('input',e=>{if(e.target.dataset.i!=null)setTopic(+e.target.dataset.i,+e.target.value)});
+
+/* Estilo do jornal */
+$('#pref-style').innerHTML=Object.entries(STYLES).map(([k,[n,d]])=>`<label class="style-opt" data-s="${k}"><input type="radio" name="style" value="${k}" ${k===state.style?'checked':''}><span class="sample" aria-hidden="true">Aa</span><b>${n}</b><small>${d}</small></label>`).join('');
+$('#pref-style').addEventListener('change',e=>{state.style=e.target.value;store.set('mp-style',state.style);renderToday();toast(`Estilo ${STYLES[state.style][0]} aplicado à edição.`)});
+
+/* ---------- Barra de menus ---------- */
+const mbT=$('#mb-trigger')||document.createElement('button'),mbM=$('#mb-menu'),win=$('#window'),note=$('#closed-note');
+function mbSet(o){if(o===!mbM.hidden)return;mbM.hidden=!o;mbT.setAttribute('aria-expanded',o);if(o){const r=mbT.getBoundingClientRect();mbM.style.top=(r.bottom+4)+'px';mbM.style.left=Math.max(8,Math.min(innerWidth-308,r.right-300))+'px';mbM.querySelector('[role="menuitem"]').focus()}}
+mbT.addEventListener('click',e=>{e.stopPropagation();mbSet(mbM.hidden)});
+document.addEventListener('click',e=>{if(!mbM.contains(e.target))mbSet(false);if(!rowMenu.contains(e.target))closeRowMenu()});
+function openWin(){win.hidden=false;note.hidden=true}
+mbM.addEventListener('click',e=>{
+  const b=e.target.closest('[data-mb]');if(!b)return;const a=b.dataset.mb,title=$('#mb-title');
+  if(a==='open'){openWin();go('hoje')}
+  if(a==='print'){openWin();go('imprimir')}
+  if(a==='prefs'){openWin();go('preferencias')}
+  if(a==='generate'){title.textContent='Gerando nova edição…';setTimeout(()=>{title.textContent='Edição extra pronta para revisar';toast('Uma edição extra está pronta para revisar.')},1400);return}
+  if(a==='pause'){state.paused=!state.paused;b.textContent=state.paused?'Retomar entregas':'Pausar até amanhã';title.textContent=state.paused?'Entregas pausadas até amanhã':'Edição #142 pronta';toast(state.paused?'Amanhã não haverá edição. Depois volta ao normal.':'Entregas retomadas.');return}
+  if(a==='quit'){mbSet(false);win.hidden=true;note.hidden=false;note.querySelector('h2').textContent='Morning Paper foi encerrado.';note.querySelector('p').textContent='Nenhuma edição será gerada até você abrir o app de novo.';$('#reopen').focus();return}
+  mbSet(false);
+});
+
+/* Navegação por teclado nos menus */
+function menuKeys(menu,close,returnTo){
+  menu.addEventListener('keydown',e=>{
+    const items=$$('[role^="menuitem"]',menu),i=items.indexOf(document.activeElement);
+    if(e.key==='ArrowDown'){e.preventDefault();items[(i+1)%items.length].focus()}
+    if(e.key==='ArrowUp'){e.preventDefault();items[(i-1+items.length)%items.length].focus()}
+    if(e.key==='Home'){e.preventDefault();items[0].focus()}
+    if(e.key==='End'){e.preventDefault();items[items.length-1].focus()}
+    if(e.key==='Escape'||e.key==='Tab'){e.preventDefault();close();returnTo()?.focus()}
+  });
+}
+menuKeys(mbM,()=>mbSet(false),()=>mbT);
+menuKeys(rowMenu,closeRowMenu,()=>rowMenuBtn);
+$$('.view').forEach(v=>v.addEventListener('scroll',closeRowMenu,{passive:true}));
+
+/* ---------- Segundo plano ---------- */
+const keep=$('#bg-keep'),mbOn=$('#bg-menubar'),dock=$('#bg-dock');
+$('#close-window').addEventListener('click',()=>{
+  win.hidden=true;note.hidden=false;const h=note.querySelector('h2'),p=note.querySelector('p');
+  if(keep.checked){h.textContent='Morning Paper continua trabalhando.';p.textContent=`A janela foi fechada, mas a próxima edição chega às ${timeSel.value}.`+(mbOn.checked?' O ícone na barra de menus abre o app de novo.':'')}
+  else{h.textContent='Morning Paper foi encerrado.';p.textContent='Ative “Continuar rodando ao fechar a janela” para receber a edição sem deixar o app aberto.'}
+  $('#reopen').focus();
+});
+$('#reopen').addEventListener('click',()=>{openWin();$('#close-window').focus()});
+function syncBg(){
+  mbT.hidden=!mbOn.checked;if(!mbOn.checked){mbSet(false);dock.checked=false}
+  dock.disabled=!mbOn.checked;
+  $('#dock-note').textContent=mbOn.checked?'O app fica só na barra de menus':'Disponível quando o atalho na barra de menus estiver ativo';
+  store.set('mp-bg',$$('#background-pref .switch').map(x=>x.checked));
+}
+const svBg=store.get('mp-bg',null);if(Array.isArray(svBg))$$('#background-pref .switch').forEach((x,i)=>x.checked=!!svBg[i]);
+$$('#background-pref .switch').forEach(x=>x.addEventListener('change',syncBg));
+
+/* ---------- Comandos (⌘K) ---------- */
+const pal=$('#palette'),palQ=$('#pal-q'),palL=$('#pal-list');
+const CMDS=[
+  {l:'Ir para Hoje',h:'Navegar',r:()=>go('hoje')},
+  {l:'Ler a edição',h:'Navegar',r:()=>go('edicao')},
+  {l:'Revisar notícias',h:'Navegar',r:()=>go('revisar')},
+  {l:'Imprimir agora',h:'Ação',r:()=>{go('imprimir');printNow()}},
+  {l:'Salvar PDF',h:'Ação',r:savePdf},
+  {l:'Adicionar fonte',h:'Ação',r:()=>{go('fontes');openAdd()}},
+  {l:'Ver fontes',h:'Navegar',r:()=>go('fontes')},
+  {l:'Trocar estilo do jornal',h:'Preferências',r:()=>go('preferencias',{focus:'pref-style'})},
+  {l:'Alterar horário da edição',h:'Preferências',r:()=>go('preferencias',{focus:'pref-time'})},
+  {l:'Escolher impressora padrão',h:'Preferências',r:()=>go('preferencias',{focus:'printer-pref'})},
+  {l:'Abrir preferências',h:'⌘,',r:()=>go('preferencias')}
+];
+let palSel=0,palItems=CMDS;
+const norm=s=>s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+function renderPal(){
+  const q=norm(palQ.value.trim());palItems=CMDS.filter(c=>norm(c.l).includes(q));palSel=Math.min(palSel,Math.max(0,palItems.length-1));
+  palL.innerHTML=palItems.length?palItems.map((c,i)=>`<li role="option" id="pal-${i}" data-i="${i}" aria-selected="${i===palSel}">${c.l}<span>${c.h}</span></li>`).join(''):`<li class="pal-empty" role="option" aria-disabled="true" aria-selected="false">Nenhum comando com “${esc(palQ.value)}”.</li>`;
+  if(palItems.length)palQ.setAttribute('aria-activedescendant','pal-'+palSel);else palQ.removeAttribute('aria-activedescendant');
+  $('#pal-'+palSel)?.scrollIntoView({block:'nearest'});
+}
+function openPal(){palQ.value='';palSel=0;renderPal();pal.showModal();palQ.focus()}
+function runPal(i){const c=palItems[i];if(!c)return;pal.close();c.r()}
+palQ.addEventListener('input',()=>{palSel=0;renderPal()});
+palQ.addEventListener('keydown',e=>{const n=Math.max(1,palItems.length);if(e.key==='ArrowDown'){e.preventDefault();palSel=(palSel+1)%n;renderPal()}if(e.key==='ArrowUp'){e.preventDefault();palSel=(palSel-1+n)%n;renderPal()}if(e.key==='Enter'){e.preventDefault();runPal(palSel)}});
+palL.addEventListener('click',e=>{const li=e.target.closest('[data-i]');if(li)runPal(+li.dataset.i)});
+pal.addEventListener('click',e=>{if(e.target===pal)pal.close()});
+$('#open-palette').addEventListener('click',openPal);
+document.addEventListener('keydown',e=>{
+  if(!(e.metaKey||e.ctrlKey))return;const k=e.key.toLowerCase();
+  if(k==='k'){e.preventDefault();pal.open?pal.close():openPal()}
+  if(k==='p'){e.preventDefault();openWin();go('imprimir')}
+  if(k===','){e.preventDefault();openWin();go('preferencias')}
+});
+
+/* ---------- Início ---------- */
+applyPrinter();applyTime();syncBg();renderTopics();renderSources();renderReview();renderPrint();renderToday();
+go(location.hash.slice(1)||'hoje',{push:false});
+</script>
+</body>
+</html>

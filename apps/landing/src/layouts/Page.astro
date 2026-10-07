@@ -1,0 +1,27 @@
+---
+// Estrutura comum às páginas: ícones, cabeçalho, rodapé e o diálogo de instalação.
+import Base from "./Base.astro";
+import Sprite from "../components/Sprite.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import DownloadDialog from "../components/DownloadDialog.astro";
+
+interface Props {
+  title: string;
+  description: string;
+}
+const { title, description } = Astro.props;
+---
+
+<Base title={title} description={description}>
+  <Sprite />
+  <Header />
+  <main id="conteudo">
+    <slot />
+  </main>
+  <Footer />
+  <DownloadDialog />
+  <script>
+    import "../scripts/site.ts";
+  </script>
+</Base>

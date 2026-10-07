@@ -1,0 +1,102 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Tipos e testes unitários do frontend do app (Vitest) e verificação da landing (astro check).
+  test:
+    name: Typecheck e testes unitários
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @morning-paper/desktop typecheck
+      - run: pnpm test
+      - run: pnpm --filter @morning-paper/landing check
+
+  # Testes do Rust. O app usa APIs do macOS (AppKit/WebKit), então roda em macOS.
+  rust:
+    name: Testes do Rust
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: apps/desktop/src-tauri -> target
+      - run: cargo test --manifest-path apps/desktop/src-tauri/Cargo.toml
+
+  # Ponta a ponta com Playwright: o app na prévia do navegador (WebKit) e a landing gerada.
+  e2e:
+    name: Testes e2e (${{ matrix.app }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [desktop, landing]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @morning-paper/${{ matrix.app }} exec playwright install --with-deps chromium webkit
+      - run: pnpm test:e2e:${{ matrix.app }}
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report-${{ matrix.app }}
+          path: |
+            apps/${{ matrix.app }}/playwright-report
+            apps/${{ matrix.app }}/test-results
+          retention-days: 14
+
+  # Gera o .dmg (Apple Silicon) e a landing, e guarda os dois como artefatos do workflow.
+  build:
+    name: Build
+    needs: [test, rust]
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: apps/desktop/src-tauri -> target
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm app:build
+      - run: pnpm landing:build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: morning-paper-macos-aarch64
+          path: apps/desktop/src-tauri/target/release/bundle/dmg/*.dmg
+          if-no-files-found: error
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        with:
+          name: landing-dist
+          path: apps/landing/dist
+          if-no-files-found: error
+          retention-days: 14

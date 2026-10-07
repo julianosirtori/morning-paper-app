@@ -1,0 +1,29 @@
+---
+// Botão de download que se adapta ao computador de quem visita (scripts/landing.ts):
+// em um Mac compatível abre o diálogo de instalação; nos outros casos leva para /downloads.
+// Sem JavaScript, é um link comum para /downloads.
+import Icon from "./Icon.astro";
+import { DOWNLOADS_URL } from "../config";
+
+interface Props {
+  variant?: "primary" | "header";
+}
+const { variant = "primary" } = Astro.props;
+---
+
+{
+  variant === "header" ? (
+    <a class="btn btn-secondary btn-sm" href={DOWNLOADS_URL} data-download>
+      <span data-label-mac>
+        Baixar<span class="btn-long"> para Mac</span>
+      </span>
+      <span data-label-other hidden>Downloads</span>
+    </a>
+  ) : (
+    <a class="btn btn-primary" href={DOWNLOADS_URL} data-download>
+      <Icon name="download" />
+      <span data-label-mac>Baixar para Mac</span>
+      <span data-label-other hidden>Ver downloads</span>
+    </a>
+  )
+}

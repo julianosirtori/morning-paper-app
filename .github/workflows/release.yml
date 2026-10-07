@@ -1,0 +1,50 @@
+name: Release
+
+# Publica o instalador no release do GitHub. É daqui que o botão de download da landing baixa:
+#   releases/download/v<versão>/Morning.Paper_<versão>_aarch64.dmg
+# Para lançar: suba a versão em apps/desktop/package.json e src-tauri/tauri.conf.json, depois
+#   git tag v0.8.4 && git push origin v0.8.4
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Confere a tag com a versão do app
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          pkg=$(node -p "require('./apps/desktop/package.json').version")
+          conf=$(node -p "require('./apps/desktop/src-tauri/tauri.conf.json').version")
+          if [ "$tag" != "$pkg" ] || [ "$tag" != "$conf" ]; then
+            echo "::error::Tag v$tag, package.json $pkg e tauri.conf.json $conf precisam ser iguais."
+            exit 1
+          fi
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: apps/desktop/src-tauri -> target
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: apps/desktop
+          tauriScript: pnpm tauri
+          tagName: ${{ github.ref_name }}
+          releaseName: Morning Paper ${{ github.ref_name }}
+          releaseBody: Instalador para Macs com chip Apple (macOS 11 ou mais recente). Veja como instalar em https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/downloads/
+          releaseDraft: false
+          prerelease: false

@@ -1,0 +1,36 @@
+---
+const steps = [
+  {
+    title: "Escolha suas fontes",
+    text: "Marque as sugestões ou cole o endereço de qualquer site: o app encontra o feed e confere na hora. Também importa sua lista de um leitor de RSS (OPML).",
+  },
+  {
+    title: "Diga o que quer ler",
+    text: "Distribua sua atenção entre sete assuntos e escolha o tamanho, de 2 a 8 páginas. Mais Brasil, menos esporte: a edição segue a proporção que você definir.",
+  },
+  {
+    title: "Escolha o horário",
+    text: "Das 05:30 às 07:30, todos os dias, a cada alguns dias ou só nos dias da semana que você marcar. Na hora marcada, o jornal sai da impressora.",
+  },
+];
+---
+
+<section class="section" id="como-funciona" aria-labelledby="h-como">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Como funciona</span>
+      <h2 class="h2" id="h-como">Configure uma vez. Leia todos os dias.</h2>
+    </div>
+    <ol class="steps">
+      {
+        steps.map((s, i) => (
+          <li class="reveal" style={`--i:${i}`}>
+            <span class="step-n" aria-hidden="true">{i + 1}.</span>
+            <h3>{s.title}</h3>
+            <p>{s.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>

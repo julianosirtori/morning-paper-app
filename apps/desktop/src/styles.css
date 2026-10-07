@@ -1,0 +1,371 @@
+@import "tailwindcss";
+
+/* ============ Tokens (tema do Tailwind) ============
+   Interface: um único acento editorial (vermelho), usado só em eyebrow, foco e alertas.
+   Jornal (.page): estritamente preto, cinza e branco — economia de tinta. */
+@theme {
+  --color-paper: #f7f6f3;
+  --color-panel: #efeeea;
+  --color-panel-2: #e5e3de;
+  --color-sel: #d9d6cf;
+  --color-desk: #d9d8d4;
+  --color-frame: #c4c1ba;
+  --color-ink: #1a1917;
+  --color-ink-2: #3a3834;
+  --color-muted: #5f5c56;
+  --color-line: #d6d3cc;
+  --color-line-strong: #8c8880;
+  --color-accent: #a8322a;
+  --color-accent-press: #8c2922;
+  --color-ok: #2f6b48;
+  --color-on-ink: #f7f6f3;
+  --color-field: #ffffff;
+
+  --color-np-paper: #fdfdfc;
+  --color-np-ink: #111111;
+  --color-np-grey: #5a5a5a;
+  --color-np-rule: #b8b8b8;
+  --color-np-light: #e4e4e4;
+
+  --font-serif: Georgia, "Times New Roman", serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* letra gótica do nome do jornal */
+  --font-blackletter: "UnifrakturMaguntia", "Old English Text MT", Georgia, serif;
+
+  --text-12: 12px;
+  --text-13: 13px;
+  --text-14: 14px;
+  --text-16: 16px;
+  --text-20: 20px;
+  --text-28: 28px;
+  --text-40: clamp(32px, 3.2vw, 40px);
+
+  --radius-ctl: 4px;
+  --radius-pop: 8px;
+
+  --shadow-pop: 0 12px 32px rgba(26, 25, 23, 0.18);
+  --shadow-page: 0 8px 24px rgba(26, 25, 23, 0.12);
+  --shadow-lift: 0 14px 32px rgba(26, 25, 23, 0.18);
+
+  --ease-out-soft: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-in-soft: cubic-bezier(0.5, 0, 0.75, 0);
+
+  /* Pontos de quebra do protótipo (usados como max-lg:, max-md:) */
+  --breakpoint-md: 860px;
+  --breakpoint-lg: 1100px;
+
+  --animate-toast-in: toast-in 220ms var(--ease-out-soft);
+  --animate-toast-out: toast-out 140ms var(--ease-in-soft) forwards;
+  @keyframes toast-in { from { opacity: 0; transform: translateY(8px); } }
+  @keyframes toast-out { to { opacity: 0; transform: translateY(8px); } }
+}
+
+/* Fonte gótica do nome do jornal — UnifrakturMaguntia (SIL OFL, ver assets/fonts/OFL.txt) */
+@font-face {
+  font-family: "UnifrakturMaguntia";
+  src: url("./assets/fonts/UnifrakturMaguntia.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ============ Base ============ */
+@layer base {
+  html, body, #root { height: 100%; }
+  body { @apply bg-paper text-ink font-sans text-14 leading-normal antialiased; }
+  button { cursor: pointer; }
+  button:disabled { cursor: not-allowed; }
+  :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+  h1 { @apply font-serif text-40 font-normal leading-[1.05] tracking-[-0.02em] my-2; }
+  h2 { @apply font-serif text-28 font-medium leading-[1.15] tracking-[-0.01em]; }
+  h3 { @apply font-serif text-20 font-semibold leading-tight; }
+  select, input[type="text"], input[type="url"], input[type="password"] {
+    @apply min-h-9 w-full px-3 border border-line-strong rounded-ctl bg-field;
+  }
+  input[type="range"], input[type="radio"], input[type="checkbox"] { accent-color: var(--color-ink); }
+  output { font-variant-numeric: tabular-nums; }
+  [aria-invalid="true"] { border-color: var(--color-accent) !important; box-shadow: 0 0 0 1px var(--color-accent); }
+}
+
+/* ============ Componentes da interface ============ */
+@layer components {
+  svg.i { @apply size-4 flex-none fill-none stroke-current; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* Botões: primário (1 por tela) · secundário · texto */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 min-h-9 px-3.5 border border-line-strong rounded-ctl bg-transparent text-ink
+      font-sans text-14 font-semibold leading-none whitespace-nowrap transition-colors duration-180 ease-out-soft disabled:opacity-55;
+    @media (hover: hover) { &:not(:disabled):hover { @apply bg-panel-2; } }
+  }
+  .btn-primary {
+    @apply bg-ink border-ink text-on-ink;
+    @media (hover: hover) { &:not(:disabled):hover { @apply bg-ink-2 border-ink-2; } }
+  }
+  .btn-danger {
+    @apply bg-accent border-accent text-on-ink;
+    @media (hover: hover) { &:not(:disabled):hover { @apply bg-accent-press border-accent-press; } }
+  }
+  .btn-sm { @apply min-h-8 px-3 text-13; }
+  .btn-text {
+    @apply inline-flex items-center gap-1.5 min-h-7 border-0 bg-transparent p-0 text-ink font-sans text-14 font-semibold leading-[1.2]
+      text-left underline decoration-line-strong underline-offset-4 disabled:text-muted disabled:no-underline;
+    @media (hover: hover) { &:not(:disabled):hover { @apply decoration-accent; } }
+  }
+  .icon-btn {
+    @apply inline-grid place-items-center size-8 border-0 rounded-ctl bg-transparent text-ink disabled:opacity-40;
+    @media (hover: hover) { &:not(:disabled):hover { @apply bg-panel-2; } }
+  }
+
+  .eyebrow { @apply font-sans text-12 font-bold leading-[1.3] tracking-[0.08em] uppercase text-accent; }
+  .section-title { @apply font-serif text-20 font-semibold leading-tight pb-3 border-b border-ink mb-2; }
+  .note { @apply text-13 text-muted; }
+  .lead { @apply text-16 text-muted max-w-[62ch]; }
+
+  /* Lista de dados (dl) */
+  .facts > div { @apply grid grid-cols-[auto_minmax(0,1fr)] gap-4 items-baseline py-3 border-b border-line; }
+  .facts dt { @apply text-muted; }
+  .facts dd { @apply font-serif text-16 font-semibold leading-[1.3] text-right; }
+  .facts dd .btn-text { @apply text-13 ml-2; }
+
+  /* Situação: sempre texto + ícone, nunca só cor */
+  .st { @apply inline-flex items-center gap-1.5 font-sans text-13 font-medium leading-[1.3]; }
+  .st svg { @apply size-3.5; }
+
+  /* Menus flutuantes */
+  .menu { @apply fixed z-40 w-[220px] bg-paper border border-line rounded-pop shadow-pop p-1.5; }
+  .menu-group { @apply border-t border-line mt-1.5 pt-1.5; }
+  .menu-label { @apply px-3 pt-1.5 pb-0.5 text-12 text-muted; }
+  .menu [role^="menuitem"] {
+    @apply flex justify-between items-center gap-3 w-full min-h-8 border-0 bg-transparent rounded-[5px] px-3 py-1.5
+      font-sans text-13 leading-[1.2] text-ink text-left hover:bg-ink hover:text-on-ink focus-visible:bg-ink focus-visible:text-on-ink focus-visible:outline-0;
+  }
+  .menu .is-danger { @apply text-accent; }
+  .menu [aria-checked] { @apply justify-start; }
+  .menu [aria-checked]::before { content: ""; @apply w-3.5 flex-none; }
+  .menu [aria-checked="true"]::before { content: "✓"; }
+
+  /* Interruptor (switch) */
+  .switch {
+    @apply appearance-none flex-none w-[38px] h-[22px] rounded-full bg-line-strong relative cursor-pointer mt-0.5
+      transition-colors duration-180 ease-out-soft checked:bg-ink disabled:opacity-45 disabled:cursor-not-allowed;
+    &::after { content: ""; @apply absolute top-0.5 left-0.5 size-[18px] rounded-full bg-field transition-transform duration-180 ease-out-soft; }
+    &:checked::after { transform: translateX(16px); }
+  }
+
+  /* Cartões de opção com rádio escondido (estilo do jornal, assistentes) */
+  .opt-card {
+    @apply relative grid gap-0.5 content-start p-3 border border-line-strong rounded-ctl cursor-pointer bg-paper;
+    & input { @apply absolute opacity-0 inset-0 m-0 cursor-pointer; }
+    &:has(input:checked) { @apply border-2 border-ink p-[11px]; }
+    &:has(input:focus-visible) { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+    &:has(input:disabled) { @apply cursor-not-allowed bg-panel border-dashed; }
+    &:has(input:disabled) b { @apply text-muted; }
+  }
+
+  /* Segmentado */
+  .seg { @apply inline-flex justify-self-start border border-line-strong rounded-ctl overflow-clip; }
+  .seg label { @apply relative; }
+  .seg input { @apply absolute opacity-0 inset-0 m-0 cursor-pointer; }
+  .seg span { @apply grid place-items-center min-h-[34px] px-3.5 font-semibold border-l border-line-strong; }
+  .seg label:first-child span { @apply border-l-0; }
+  .seg input:checked + span { @apply bg-ink text-on-ink; }
+  .seg input:focus-visible + span { outline: 2px solid var(--color-accent); outline-offset: -4px; }
+
+  /* Diálogos (<dialog> nativo) */
+  dialog.modal-box {
+    @apply m-auto border-0 p-0 w-[min(480px,calc(100vw-32px))] rounded-pop shadow-pop bg-paper text-ink;
+    &::backdrop { background: rgba(26, 25, 23, 0.4); }
+  }
+  dialog.palette { @apply w-[min(560px,calc(100vw-32px))] mt-[12vh]; }
+}
+
+/* ============ Página de jornal (preto e branco) ============
+   Proporções de jornal impresso em A4 (100cqi = 210 mm): margem ~8 mm (3,8cqi),
+   corpo ~8,5 pt (1,42cqi) com entrelinha 1,3, colunas estreitas com fio entre elas,
+   texto justificado com recuo de parágrafo e capitular na matéria principal.
+   Fica como CSS de componente: unidades cqi, colunas e ::first-letter não cabem bem em utilitárias. */
+@layer components {
+  .page { container-type: inline-size; @apply bg-np-paper text-np-ink border border-np-rule shadow-page aspect-[1/1.414] w-full; }
+  .page-in { @apply h-full flex flex-col; padding: 3.6cqi 3.8cqi 3cqi; font: 1.42cqi/1.3 var(--font-serif); }
+  .np-mast { display: grid; grid-template-columns: 1fr auto 1fr; align-items: end; gap: 2cqi; padding-bottom: 0.8cqi; }
+  .np-mast b { font: 400 7.6cqi/1 var(--font-blackletter); text-align: center; white-space: nowrap; }
+  .np-ear { display: grid; gap: 0.2cqi; font: 1.1cqi/1.25 var(--font-sans); text-transform: uppercase; letter-spacing: 0.06em; }
+  .np-ear > span { display: block; }
+  .np-ear-r { text-align: right; }
+  .np-sechead { display: flex; justify-content: space-between; align-items: baseline; gap: 2cqi; padding-bottom: 0.6cqi; }
+  .np-sechead b { font: 400 3cqi/1 var(--font-blackletter); }
+  .np-sechead span { font: 800 1.3cqi/1.2 var(--font-sans); letter-spacing: 0.12em; text-transform: uppercase; }
+  .np-dateline { display: flex; justify-content: space-between; gap: 2cqi; border-top: 0.15cqi solid; border-bottom: 0.5cqi double; padding: 0.45cqi 0; margin: 0 0 1.6cqi; font: 600 1.05cqi/1.2 var(--font-sans); letter-spacing: 0.08em; text-transform: uppercase; }
+  .page [hidden] { display: none !important; }
+  .np-kicker { font: 800 1.1cqi/1.2 var(--font-sans); letter-spacing: 0.12em; text-transform: uppercase; margin: 0 0 0.6cqi; }
+  .np-head { font: 700 4.6cqi/1.02 var(--font-serif); letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
+  .np-sub { font: italic 1.85cqi/1.25 var(--font-serif); margin: 0.8cqi 0; }
+  .np-byline { font: 600 1.05cqi/1.2 var(--font-sans); letter-spacing: 0.06em; text-transform: uppercase; margin: 0 0 1cqi; color: var(--color-np-grey); }
+  .np-fig { margin: 0 0 1.2cqi; flex: none; }
+  .np-fig .np-img { aspect-ratio: 16/9; }
+  .np-fig--wide .np-img { aspect-ratio: 2.3/1; }
+  .np-fig--photo .np-img { aspect-ratio: 3/2; }
+  /* Foto que ocupa a altura toda da área (diagrama "banner") */
+  .np-fig--fill { display: flex; flex-direction: column; min-height: 0; margin: 0; }
+  .np-fig--fill .np-img { flex: 1; min-height: 0; aspect-ratio: auto; }
+  .np-cap { font: 1.1cqi/1.3 var(--font-sans); color: var(--color-np-grey); margin-top: 0.5cqi; }
+
+  /* Áreas de altura fixa. Colunas feitas à mão (hooks/columnFlow.ts): o WebKit ignora `columns` na impressão.
+     --cols diz quantas colunas cada área tem; o texto passa de uma para a outra e o excesso sai. */
+  [data-slot], .np-flow { overflow: hidden; min-height: 0; }
+  .np-flow { display: flex; flex-direction: column; }
+  .np-src { display: none; }
+  .np-cols { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(var(--cols, 1), minmax(0, 1fr)); column-gap: 1.6cqi; }
+  .np-col { min-width: 0; min-height: 0; overflow: hidden; }
+  /* Fio entre as colunas, no meio do espaço entre elas (a margem negativa não muda a largura do texto). */
+  .np-col + .np-col { border-left: 0.1cqi solid var(--color-np-rule); margin-left: -0.8cqi; padding-left: 0.7cqi; }
+  .np-text { --cols: 3; flex: 1; }
+  /* Parágrafo que continua na próxima coluna: última linha justificada; a continuação começa sem recuo. */
+  .np-split { text-align-last: justify; }
+  p.np-cont, .np-cont > p:first-child { text-indent: 0 !important; }
+  .np-story.np-cont { border-top: 0 !important; padding-top: 0 !important; margin-top: 0 !important; }
+  .np-text p, .np-story p { margin: 0; text-align: justify; hyphens: auto; text-indent: 1.2em; }
+  .np-text .np-col:first-child > p:first-child, .np-story > p:first-of-type { text-indent: 0; }
+  .np-text .np-col:first-child > p:first-child::first-letter { float: left; font: 700 3.9cqi/0.8 var(--font-serif); margin: 0.35cqi 0.5cqi 0 0; }
+  .np-lead-main { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
+  .np-lead-row { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 1.6cqi; }
+  .np-lead-row > * { min-height: 0; }
+  .np-lead-row--right > .np-fig { order: 2; }
+  .np-lead-row .np-text { --cols: 2; }
+  .np-side { border-left: 0.1cqi solid var(--color-np-rule); padding-left: 1.8cqi; display: flex; flex-direction: column; gap: 1.1cqi; }
+  .np-side-label { flex: none; font: 800 1.1cqi/1.2 var(--font-sans); letter-spacing: 0.12em; text-transform: uppercase; border-bottom: 0.35cqi solid; padding-bottom: 0.4cqi; }
+  .np-side .np-story + .np-story { border-top: 0.1cqi solid var(--color-np-rule); padding-top: 1.1cqi; }
+  .np-story h3 { font: 700 1.95cqi/1.08 var(--font-serif); margin: 0 0 0.5cqi; break-after: avoid; text-wrap: balance; hyphens: auto; overflow-wrap: break-word; }
+  .np-head { hyphens: auto; overflow-wrap: break-word; }
+  .np-story h3, .np-story-kicker { break-inside: avoid; }
+  .np-story-kicker { font: 800 0.95cqi/1.2 var(--font-sans); letter-spacing: 0.12em; text-transform: uppercase; margin: 0 0 0.3cqi; color: var(--color-np-grey); break-after: avoid; }
+  .np-story-fig { margin: 0 0 0.7cqi; break-inside: avoid; }
+  .np-story-fig .np-img { aspect-ratio: 3/2; }
+  .np-side .np-story:first-of-type h3 { font-size: 2.4cqi; }
+  .np-more .np-story { margin-bottom: 1.3cqi; }
+  .np-more .np-story + .np-story { border-top: 0.1cqi solid var(--color-np-rule); padding-top: 1cqi; }
+  .np-text .np-story--fill { margin-top: 1.2cqi; padding-top: 1cqi; border-top: 0.35cqi solid; }
+  .np-list { counter-reset: np; display: grid; gap: 0.6cqi; break-inside: avoid; }
+  .np-list li { counter-increment: np; display: grid; grid-template-columns: 2.2cqi 1fr; font: 1.42cqi/1.3 var(--font-serif); }
+  .np-list li::before { content: counter(np); font: 700 1.7cqi/1 var(--font-serif); }
+  .np-foot { flex: none; margin-top: 1cqi; border-top: 0.15cqi solid; padding-top: 0.6cqi; display: flex; justify-content: space-between; font: 1.05cqi/1.2 var(--font-sans); }
+  .np-briefs { border-top: 0.5cqi double; padding-top: 0.9cqi; min-height: 0; }
+  .np-briefs-label { font: 800 1.1cqi/1.2 var(--font-sans); letter-spacing: 0.12em; text-transform: uppercase; margin: 0 0 0.7cqi; }
+  .np-briefs-grid { --cols: 5; height: 9cqi; }
+  .np-briefs-grid p { margin: 0 0 0.7cqi; text-align: justify; hyphens: auto; font-size: 1.3cqi; }
+  .np-briefs-grid b { font: 800 1.1cqi/1 var(--font-sans); letter-spacing: 0.06em; text-transform: uppercase; }
+
+  /* ===== Diagramas =====
+     .np-body ocupa a altura entre o cabeçalho e o rodapé; as linhas em fr dividem essa altura,
+     e cada área tem tamanho fixo (minmax(0, …)) para o texto não empurrar a página. */
+  .np-body { flex: 1; min-height: 0; display: grid; column-gap: 1.8cqi; row-gap: 1.4cqi; }
+  .np-body > * { min-width: 0; min-height: 0; }
+  .np-a-main { grid-area: main; }
+  .np-a-second { grid-area: second; }
+  .np-a-side { grid-area: side; }
+  .np-a-more { grid-area: more; border-top: 0.15cqi solid; padding-top: 1.2cqi; }
+  .np-a-briefs { grid-area: briefs; }
+  .np-a-head { grid-area: head; }
+  .np-a-fig { grid-area: fig; }
+
+  /* Capa: principal em 4 de 5 colunas, "Em resumo" na 5ª, mais notícias e curtas embaixo */
+  .np-body--front { grid-template-columns: repeat(5, minmax(0, 1fr)); grid-template-rows: minmax(0, 1.9fr) minmax(0, 1fr) auto;
+    grid-template-areas: "main main main main side" "more more more more more" "briefs briefs briefs briefs briefs"; }
+  .np-body--front .np-side { padding-left: 1.4cqi; }
+  .np-body--front .np-side .np-story:first-of-type h3 { font-size: 1.95cqi; }
+  .np-body--front .np-more { --cols: 5; }
+  .np-body--front.np-body--noside .np-a-main { grid-column: 1 / -1; }
+
+  /* Clássico: principal em 2/3 com foto em cima, coluna lateral, matérias corridas embaixo */
+  .np-body--classic { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: minmax(0, 1.9fr) minmax(0, 1fr);
+    grid-template-areas: "main main side" "more more more"; }
+  .np-body--classic .np-more { --cols: 4; }
+  .np-body--classic.np-body--noside .np-a-main { grid-column: 1 / -1; }
+  .np-body--classic.np-body--noside .np-text { --cols: 4; }
+  .np-body--classic.np-body--nomore, .np-body--rail.np-body--nomore { grid-template-rows: minmax(0, 1fr) 0; }
+  .np-body--split.np-body--nomore { grid-template-areas: "main main second second" "side side side side"; }
+
+  /* Banner: título largo, foto grande ao lado do texto e uma faixa de matérias com foto */
+  .np-body--banner { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: auto minmax(0, 1fr) minmax(0, 1.1fr) auto;
+    grid-template-areas: "head head head head" "fig fig fig main" "s1 s2 s3 s4" "briefs briefs briefs briefs"; }
+  .np-body--banner .np-head { font-size: 5.4cqi; }
+  .np-body--banner .np-lead-head { border-bottom: 0.15cqi solid; padding-bottom: 0.4cqi; }
+  .np-body--banner .np-byline { margin: 0; }
+  .np-body--banner .np-a-main { display: flex; flex-direction: column; }
+  .np-body--banner .np-text { --cols: 1; }
+  .np-body--banner .np-strip-col { border-top: 0.15cqi solid; padding-top: 1.2cqi; }
+  .np-body--banner .np-strip-col + .np-strip-col { border-left: 0.1cqi solid var(--color-np-rule); padding-left: 1.8cqi; margin-left: -1.8cqi; }
+  .np-body--banner .np-strip-col .np-story:first-child h3 { font-size: 2.2cqi; }
+  .np-body--banner .np-strip-col .np-story + .np-story { margin-top: 1.1cqi; padding-top: 1cqi; border-top: 0.1cqi solid var(--color-np-rule); }
+  .np-body--banner.np-body--nomore { grid-template-rows: auto minmax(0, 1fr) 0 auto; }
+
+  /* Trilho: coluna estreita de chamadas com fotos à esquerda, principal larga à direita */
+  .np-body--rail { grid-template-columns: repeat(5, minmax(0, 1fr)); grid-template-rows: minmax(0, 1.5fr) minmax(0, 1fr);
+    grid-template-areas: "side main main main main" "side more more more more"; }
+  .np-body--rail .np-side { border-left: 0; padding-left: 0; border-right: 0.1cqi solid var(--color-np-rule); padding-right: 1.4cqi; }
+  .np-body--rail .np-side .np-story:first-of-type h3 { font-size: 1.95cqi; }
+  .np-body--rail .np-more { --cols: 4; }
+  .np-body--rail.np-body--noside .np-a-main, .np-body--rail.np-body--noside .np-a-more { grid-column: 1 / -1; }
+
+  /* Dupla: duas principais lado a lado; embaixo, matérias corridas e uma coluna de curtas */
+  .np-body--split { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: minmax(0, 1.55fr) minmax(0, 1fr);
+    grid-template-areas: "main main second second" "more more more side"; }
+  .np-body--split .np-head { font-size: 3.2cqi; }
+  .np-body--split .np-fig .np-img { aspect-ratio: 16/9; }
+  .np-body--split .np-text { --cols: 2; }
+  .np-body--split .np-a-second { border-left: 0.1cqi solid var(--color-np-rule); padding-left: 1.8cqi; margin-left: -0.9cqi; }
+  .np-body--split .np-more { --cols: 3; }
+  .np-body--split .np-a-side { border-top: 0.15cqi solid; padding-top: 1.2cqi; }
+  .np-body--split .np-side .np-story:first-of-type h3, .np-side--briefs .np-story h3 { font-size: 1.6cqi; }
+  .np-body--split.np-body--noside .np-a-more { grid-column: 1 / -1; }
+
+  /* Imagens editoriais em retícula (meio-tom) — ilustração, não foto de notícia */
+  .np-img { aspect-ratio: 4/3; position: relative; background-color: var(--color-np-light); }
+  .np-img::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle, rgba(17, 17, 17, 0.5) 32%, transparent 36%) 0 0/4px 4px; }
+  .np-img--field { background-image: linear-gradient(180deg, #f2f2f2 0 40%, #cfcfcf 40% 52%, #8e8e8e 52% 70%, #4a4a4a 70%); }
+  .np-img--field::after { content: ""; position: absolute; width: 24%; aspect-ratio: 1; border-radius: 50%; background: var(--color-np-paper); right: 16%; top: 12%; }
+  .np-img--city { background-image: linear-gradient(180deg, #ededed 0 30%, transparent 30%), linear-gradient(90deg, #5c5c5c 0 12%, #9c9c9c 12% 22%, #3c3c3c 22% 36%, #b4b4b4 36% 44%, #555555 44% 60%, #8a8a8a 60% 74%, #2e2e2e 74% 86%, #a6a6a6 86%); }
+  .np-img--sea { background-image: linear-gradient(180deg, #e9e9e9 0 46%, #7a7a7a 46% 48%, #a9a9a9 48% 64%, #6e6e6e 64% 80%, #3d3d3d 80%); }
+  /* Foto real do feed: P&B com contraste de jornal; a retícula (::before) fica por cima */
+  .np-img--photo { overflow: hidden; }
+  .np-img--photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.15) brightness(1.05); }
+  .np-img--photo::before { z-index: 1; background: radial-gradient(circle, rgba(17, 17, 17, 0.22) 30%, transparent 34%) 0 0/3px 3px; }
+  .page-in { overflow: hidden; }
+  .np-img--desk { background-image: radial-gradient(ellipse at 30% 60%, #3a3a3a 0 18%, transparent 19%), linear-gradient(160deg, #dcdcdc 0 55%, #9a9a9a 55%); }
+
+  /* Estilos de edição */
+  .page[data-style="modern"] .np-head, .page[data-style="modern"] .np-story h3 { font-family: var(--font-sans); font-weight: 800; letter-spacing: -0.035em; }
+  .page[data-style="modern"] .np-sub { font-family: var(--font-sans); font-style: normal; }
+  .page[data-style="modern"] .np-dateline { border-bottom: 0.15cqi solid; }
+  .page[data-style="financial"] .np-dateline { background: var(--color-np-ink); color: var(--color-np-paper); border: 0; padding: 0.6cqi 1cqi; }
+  .page[data-style="financial"] .np-kicker { display: inline-block; background: var(--color-np-ink); color: var(--color-np-paper); padding: 0.3cqi 0.8cqi; }
+  .page[data-style="financial"] .np-head { font-size: 4cqi; }
+  .page[data-style="minimal"] .np-head { font-weight: 400; letter-spacing: -0.03em; }
+  .page[data-style="minimal"] .np-col + .np-col { border-left-color: transparent; }
+  .page[data-style="minimal"] .np-side { border-left: 0; }
+  .page[data-style="minimal"] .np-dateline { border-bottom: 0.15cqi solid; }
+  .page[data-style="minimal"] .np-text .np-col:first-child > p:first-child::first-letter { float: none; font: inherit; margin: 0; }
+}
+
+/* ============ Impressão (diálogo nativo do macOS) ============
+   Só as páginas do jornal saem no papel, uma por folha A4, sem margens. */
+/* Na tela, as folhas ficam fora da vista mas com o tamanho do papel: o encaixe (useFitPage) precisa medir
+   cada página exatamente como ela sai na impressão. */
+.print-root { position: fixed; left: -10000px; top: 0; width: 210mm; visibility: hidden; pointer-events: none; }
+.print-root .page { width: 210mm; height: calc(297mm - 1px); aspect-ratio: auto; }
+@media print {
+  @page { size: A4; margin: 0; }
+  html, body, #root { height: auto; background: #fff; }
+  #root > :not(.print-root) { display: none !important; }
+  .print-root { display: block; position: static; width: auto; visibility: visible; font-size: 0; line-height: 0; }
+  /* Cada folha é um bloco inquebrável (inline-block): se o WebKit paginar por dentro dela, ele empurra
+     linhas e blocos perto da quebra e a folha sai diferente da tela (texto cortado, buracos).
+     Uma folha por linha; a linha que não cabe vai para a próxima página do papel. */
+  .print-root .page { display: inline-block; vertical-align: top; width: 210mm; height: calc(297mm - 1px); /* 297mm exatos estouram a folha no WebKit e geram páginas em branco */ aspect-ratio: auto; border: 0; box-shadow: none; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0s !important; animation-duration: 0s !important; }
+}

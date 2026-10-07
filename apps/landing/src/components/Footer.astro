@@ -1,0 +1,15 @@
+---
+import { BASE, DOWNLOADS_URL, NAV, REPO_URL } from "../config";
+---
+
+<footer class="site-footer">
+  <div class="wrap">
+    <a class="wordmark" href={BASE} aria-label="Morning Paper, voltar ao topo">Morning Paper</a>
+    <nav aria-label="Rodapé">
+      {NAV.map((item) => <a href={item.href}>{item.label}</a>)}
+      <a href={DOWNLOADS_URL}>Downloads</a>
+      <a href={REPO_URL}>Código no GitHub</a>
+    </nav>
+    <p class="meta">© <span data-year>{new Date().getFullYear()}</span> Morning Paper. Feito para quem gosta de ler no papel.</p>
+  </div>
+</footer>

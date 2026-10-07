@@ -1,0 +1,108 @@
+---
+import Page from "../layouts/Page.astro";
+import Icon from "../components/Icon.astro";
+import InstallSteps from "../components/InstallSteps.astro";
+import { DMG_NAME, DMG_URL, DOWNLOADS_URL, MIN_MACOS, RELEASE_URL, RELEASES_URL, REPO_URL, VERSION } from "../config";
+
+const pageUrl = new URL(DOWNLOADS_URL, Astro.site).href;
+
+const platforms = [
+  { id: "mac-arm", name: "macOS · chip Apple", req: `M1 ou mais recente · macOS ${MIN_MACOS}+`, available: true },
+  { id: "mac-intel", name: "macOS · Intel", req: "Processador Intel", available: false },
+  { id: "windows", name: "Windows", req: "", available: false },
+  { id: "linux", name: "Linux", req: "", available: false },
+];
+---
+
+<Page
+  title="Downloads · Morning Paper"
+  description={`Baixe o Morning Paper ${VERSION} para macOS. Confira se o seu computador é compatível e veja todas as versões no GitHub.`}
+>
+  <div class="wrap dl-wrap">
+    <header class="dl-head">
+      <span class="eyebrow">Downloads · versão {VERSION}</span>
+      <h1 class="h2">Baixar o Morning Paper</h1>
+      <p class="lede">Grátis e open source. Os instaladores ficam nos <a href={RELEASES_URL}>releases do GitHub</a>.</p>
+    </header>
+
+    <section class="env-card" aria-labelledby="env-title" aria-live="polite">
+      <span class="eyebrow">Seu computador</span>
+      <h2 class="env-title" id="env-title" data-env-title>
+        <span class="js-only">Verificando seu computador…</span>
+        <noscript>Confira se o seu computador está na lista abaixo.</noscript>
+      </h2>
+      <p class="env-text" data-env-text hidden></p>
+
+      <div class="env-actions" data-env-ok hidden>
+        <a class="btn btn-primary" href={DMG_URL}>
+          <Icon name="download" />
+          Baixar para Mac
+        </a>
+        <span class="meta"><code>{DMG_NAME}</code></span>
+      </div>
+
+      <div data-env-no hidden>
+        <p class="meta">Copie o link desta página e abra no seu Mac, ou mande para você mesmo por mensagem ou e-mail.</p>
+        <div class="copy-field">
+          <label class="sr-only" for="page-url">Link da página de downloads</label>
+          <input id="page-url" type="text" value={pageUrl} readonly />
+          <button class="btn btn-secondary" type="button" id="copy-btn">
+            <Icon name="copy" />
+            <span>Copiar link</span>
+          </button>
+        </div>
+        <p class="status" id="copy-status" role="status" hidden></p>
+      </div>
+    </section>
+
+    <section aria-labelledby="h-plat">
+      <h2 class="dl-h" id="h-plat">Todas as plataformas</h2>
+      <ul class="plat">
+        {
+          platforms.map((p) => (
+            <li data-plat={p.id}>
+              <div class="plat-name">
+                <b>{p.name}</b>
+                {p.req && <span>{p.req}</span>}
+                <em class="plat-you" hidden>Seu computador</em>
+              </div>
+              {p.available ? (
+                <span class="plat-status ok"><Icon name="check" />Disponível</span>
+              ) : (
+                <span class="plat-status"><Icon name="minus" />Ainda não disponível</span>
+              )}
+              <div class="plat-action">
+                {p.available && (
+                  <a class="link" href={DMG_URL}>
+                    <Icon name="download" />
+                    .dmg
+                  </a>
+                )}
+              </div>
+            </li>
+          ))
+        }
+        <li>
+          <div class="plat-name"><b>Código-fonte</b><span>Tauri + React, licença no repositório</span></div>
+          <span class="plat-status"><Icon name="github" class="i-fill" />GitHub</span>
+          <div class="plat-action"><a class="link" href={REPO_URL}>Abrir <Icon name="external" /></a></div>
+        </li>
+      </ul>
+      <p class="meta dl-why">
+        Por que só Mac? A impressão sem diálogo, o PDF e o despertar do computador usam recursos do macOS. Para saber quando
+        sair uma versão nova, acompanhe os <a href={RELEASES_URL}>releases no GitHub</a> (Watch › Custom › Releases).
+      </p>
+    </section>
+
+    <section aria-labelledby="h-install">
+      <h2 class="dl-h" id="h-install">Como instalar no Mac</h2>
+      <InstallSteps />
+      <p class="meta dl-why">
+        Arquivos, notas e versões anteriores: <a href={RELEASE_URL}>release v{VERSION}</a> · <a href={RELEASES_URL}>todos os releases</a>.
+      </p>
+    </section>
+  </div>
+  <script>
+    import "../scripts/downloads.ts";
+  </script>
+</Page>

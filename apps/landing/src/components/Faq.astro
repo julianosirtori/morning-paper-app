@@ -1,0 +1,52 @@
+---
+import Icon from "./Icon.astro";
+import { MIN_MACOS, REPO_URL } from "../config";
+---
+
+<section class="section" id="perguntas" aria-labelledby="h-faq" style="padding-top:0">
+  <div class="wrap faq-wrap">
+    <div class="section-head flush">
+      <span class="eyebrow">Perguntas frequentes</span>
+      <h2 class="h2" id="h-faq">Antes de baixar</h2>
+    </div>
+    <div class="faq">
+      <details>
+        <summary>Preciso deixar o Mac ligado?<Icon name="plus" /></summary>
+        <div class="ans">
+          <p>Não. Ele pode ficar em repouso: na hora da edição, o Morning Paper acorda o Mac por alguns minutos, monta o jornal e envia para a impressora.</p>
+          <p>Se o Mac estava desligado, a edição é gerada quando você abrir o app. Ela só é impressa se o atraso for de até 2 horas, para não sair um jornal velho no meio da tarde.</p>
+        </div>
+      </details>
+      <details>
+        <summary>Preciso pagar por uma IA?<Icon name="plus" /></summary>
+        <div class="ans">
+          <p>Não. A IA é opcional. Se você já usa o Claude Code, Codex, Gemini ou opencode, o Morning Paper usa a sua conta neles; o Ollama roda de graça no próprio Mac. O app não pede chave de API.</p>
+          <p>Sem IA, a edição usa o resumo que cada fonte publica.</p>
+        </div>
+      </details>
+      <details>
+        <summary>E se eu não tiver impressora, ou ela estiver desligada?<Icon name="plus" /></summary>
+        <p class="ans">A edição é salva em PDF em Documentos › Morning Paper de qualquer jeito. Você pode ler na tela, com zoom e todas as páginas, e imprimir mais tarde.</p>
+      </details>
+      <details>
+        <summary>Quais fontes posso adicionar?<Icon name="plus" /></summary>
+        <p class="ans">Qualquer site que publique RSS ou Atom: jornais, blogs, revistas. Cole o endereço do site e o app encontra o feed. Se você já usa um leitor de feeds, exporte sua lista em OPML e importe tudo de uma vez.</p>
+      </details>
+      <details>
+        <summary>Em que idiomas funciona?<Icon name="plus" /></summary>
+        <p class="ans">O app segue o idioma do macOS, em português ou inglês. A edição pode sair em português, inglês ou espanhol.</p>
+      </details>
+      <details>
+        <summary>Quanto custa e qual Mac preciso?<Icon name="plus" /></summary>
+        <div class="ans">
+          <p>É grátis e open source: o código está no <a href={REPO_URL}>GitHub</a>.</p>
+          <p>Precisa de um Mac com Apple Silicon (M1 ou mais recente) e macOS {MIN_MACOS} ou mais recente.</p>
+        </div>
+      </details>
+      <details>
+        <summary>O macOS diz que não pode abrir o app. E agora?<Icon name="plus" /></summary>
+        <p class="ans">Na primeira vez, o macOS pode bloquear apps baixados fora da App Store. Abra Ajustes do Sistema › Privacidade e Segurança, role até o aviso sobre o Morning Paper e clique em “Abrir mesmo assim”. Só é preciso fazer isso uma vez.</p>
+      </details>
+    </div>
+  </div>
+</section>

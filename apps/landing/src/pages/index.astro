@@ -1,0 +1,26 @@
+---
+import Page from "../layouts/Page.astro";
+import Hero from "../components/Hero.astro";
+import HowItWorks from "../components/HowItWorks.astro";
+import Night from "../components/Night.astro";
+import Styles from "../components/Styles.astro";
+import Control from "../components/Control.astro";
+import Faq from "../components/Faq.astro";
+import FinalCta from "../components/FinalCta.astro";
+---
+
+<Page
+  title="Morning Paper: seu jornal da manhã, impresso no seu Mac"
+  description="O Morning Paper lê as fontes em que você confia, junta as notícias repetidas e imprime uma edição só sua, em preto e branco, antes do café. Grátis e open source para macOS."
+>
+  <Hero />
+  <HowItWorks />
+  <Night />
+  <Styles />
+  <Control />
+  <Faq />
+  <FinalCta />
+  <script>
+    import "../scripts/home.ts";
+  </script>
+</Page>

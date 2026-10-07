@@ -1,0 +1,602 @@
+{
+  "app": {
+    "tagline": "Your newspaper, every morning",
+    "footerTitle": "Open source · v{{version}}",
+    "footerNote": "Your data stays on your Mac."
+  },
+  "nav": {
+    "label": "Main",
+    "groupRead": "Read and print",
+    "groupSetup": "Set up",
+    "today": "Today",
+    "edition": "Edition",
+    "review": "Review",
+    "print": "Print",
+    "sources": "Sources",
+    "preferences": "Preferences"
+  },
+  "toolbar": {
+    "openCommands": "Open commands (Command K)",
+    "today": {
+      "meta": "Edition #{{n}} · ready · {{count}} stories",
+      "review": "Review stories",
+      "print": "Print newspaper",
+      "empty": "No edition yet"
+    },
+    "edition": {
+      "meta": "#{{n}} · page {{page}} of {{total}} · {{style}} style",
+      "pdf": "Download PDF",
+      "print": "Print"
+    },
+    "review": {
+      "meta": "{{included}} of {{total}} stories in the edition",
+      "final": "See final edition"
+    },
+    "print": {
+      "pdf": "Save PDF",
+      "now": "Print now",
+      "sending": "Sending…"
+    },
+    "sources": {
+      "meta": "{{active}} active of {{total}}",
+      "import": "Import OPML",
+      "add": "Add source",
+      "check": "Check sources"
+    },
+    "preferences": {
+      "meta": "Saved automatically"
+    }
+  },
+  "sections": {
+    "world": "World",
+    "brazil": "Brazil",
+    "business": "Business",
+    "tech": "Technology",
+    "science": "Science",
+    "culture": "Culture",
+    "sports": "Sports",
+    "local": "Local"
+  },
+  "priority": {
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low"
+  },
+  "styles": {
+    "classic": {
+      "name": "Classic",
+      "description": "Traditional newspaper"
+    },
+    "modern": {
+      "name": "Modern",
+      "description": "Contemporary editorial"
+    },
+    "financial": {
+      "name": "Financial",
+      "description": "Dense and direct"
+    },
+    "minimal": {
+      "name": "Minimal",
+      "description": "Typography only"
+    }
+  },
+  "newspaper": {
+    "privatePaper": "Your private newspaper",
+    "bwA4": "Black and white · A4",
+    "editionNumber": "Edition {{n}}",
+    "pageCount": "{{count}} pages",
+    "dateline": "Yesterday's news, read slowly",
+    "editionPage": "Edition {{n}} · page {{page}}",
+    "briefs": "Briefs",
+    "footer": "Morning Paper · your private edition",
+    "pageLabel": "Page {{page}} of {{total}}: {{section}}"
+  },
+  "today": {
+    "eyebrow": "{{date}} · Edition #{{n}}",
+    "title": "Your newspaper is ready.",
+    "lead": "Yesterday's important news, organized so you can read it calmly today.",
+    "openFront": "Open today's edition to read",
+    "frontHint": "Front page · click to read all {{count}} pages",
+    "styleLabel": "{{style}} style",
+    "factsTitle": "Today's edition",
+    "facts": {
+      "pages": "Pages",
+      "pagesValue": "{{count}} · A4 · black and white",
+      "articles": "Stories",
+      "articlesValue": "{{count}} included",
+      "sources": "Sources",
+      "sourcesValue": "{{count}} active",
+      "assistant": "Assistant",
+      "printer": "Printer"
+    },
+    "timelineTitle": "While you were sleeping",
+    "timeline": {
+      "collected": "News collected",
+      "grouped": "Duplicates merged",
+      "built": "Edition laid out",
+      "builtDetail": "Summaries and front page in the {{style}} style",
+      "pdf": "PDF saved",
+      "sent": "Sent to the printer",
+      "collectedDetail_one": "{{count}} source read",
+      "collectedDetail_other": "{{count}} sources read",
+      "groupedDetail_one": "{{count}} repeated story merged",
+      "groupedDetail_other": "{{count}} repeated stories merged",
+      "summarized": "Summaries written",
+      "summarizedDetail": "By {{name}}"
+    },
+    "next": "Next edition",
+    "nextTitle": "The next edition arrives {{when}} at {{time}}.",
+    "nextText": "You don't need to keep the app open. It collects, organizes and prints on its own.",
+    "changeTime": "Change time",
+    "emptyTitle": "Your first edition",
+    "emptyLead": "As soon as the news is collected, the front page shows up here.",
+    "emptyText": "The next edition comes out on its own {{when}} at {{time}}. If you like, generate one now with the latest news.",
+    "emptyNoSources": "Pick at least one source so Morning Paper has something to read.",
+    "addSources": "Choose sources",
+    "oldTitle": "Your latest edition.",
+    "oldLead": "Today's edition isn't out yet. Meanwhile, here's the most recent one.",
+    "timelineTitleManual": "How this edition was made",
+    "pausedTitle": "The {{when}} edition is skipped. Then it goes back to normal.",
+    "aiSkipped": "The AI assistant didn't respond; the edition used the sources' own summaries."
+  },
+  "edition": {
+    "eyebrow": "{{date}} · Edition #{{n}}",
+    "title": "Read your edition.",
+    "lead": "Leaf through it like a real newspaper. Use the ← → keys to turn the page.",
+    "backToToday": "Back to today's edition",
+    "pagesNav": "Edition pages",
+    "thumb": "Page {{page}}: {{section}}",
+    "stage": "Page being read",
+    "controls": "Reading controls",
+    "pageOf": "Page {{page}} of {{total}}",
+    "previous": "← Previous",
+    "next": "Next →",
+    "size": "Size",
+    "zoomOut": "Zoom out",
+    "zoomIn": "Zoom in",
+    "style": "Edition style",
+    "change": "Change"
+  },
+  "review": {
+    "eyebrow": "{{included}} of {{total}} stories in the edition",
+    "title": "Review before printing.",
+    "lead": "If something doesn't seem important to you, take it out. You can bring it back whenever you want.",
+    "importance": {
+      "high": "high importance",
+      "medium": "medium importance",
+      "low": "low importance"
+    },
+    "headlineBadge": "Front-page headline",
+    "openAt": "Open on {{source}} ↗",
+    "inEdition": "In the edition",
+    "outOfEdition": "Out of the edition",
+    "remove": "Take out",
+    "putBack": "Put back",
+    "headlineLocked": "The headline can't be removed. Pick another one first.",
+    "editSummary": "Edit summary",
+    "makeHeadline": "Make headline",
+    "section": "Section",
+    "summaryOf": "Summary of “{{title}}”",
+    "saveSummary": "Save summary",
+    "cancel": "Cancel",
+    "toast": {
+      "removed": "Story taken out of the edition.",
+      "back": "Story back in the edition.",
+      "saved": "Summary saved.",
+      "headline": "New front-page headline.",
+      "moved": "Moved to {{section}}."
+    }
+  },
+  "print": {
+    "eyebrow": "All set",
+    "title": "Print your newspaper.",
+    "lead": "Today's edition is ready in black and white, on A4 paper, to save ink.",
+    "facts": {
+      "edition": "Edition",
+      "format": "Format",
+      "formatValue": "{{count}} pages · A4",
+      "color": "Color",
+      "colorValue": "Black and white",
+      "printer": "Printer",
+      "status": "Status"
+    },
+    "change": "Change",
+    "copies": "Copies",
+    "lessCopy": "One copy less",
+    "moreCopy": "One copy more",
+    "range": "What to print",
+    "rangeAll": "All {{count}} pages",
+    "rangeFront": "Front page only",
+    "chooseAnother": "choose another one",
+    "history": "Previous editions",
+    "historyItem": "#{{n}} · {{count}} pages →",
+    "msg": {
+      "offline": "{{printer}} is off. Turn the printer on and try again, or",
+      "pdf": "PDF ready: choose “Save as PDF” in the dialog. Suggested name: morning-paper-{{n}}.pdf",
+      "sent_one": "Sent to {{printer}}: {{count}} copy, {{what}}.",
+      "sent_other": "Sent to {{printer}}: {{count}} copies, {{what}}.",
+      "whatFront": "front page only",
+      "whatAll": "{{count}} pages",
+      "failed": "The print dialog didn't open. Try again."
+    },
+    "toast": {
+      "failed": "Couldn't print.",
+      "pdfOpen": "PDF dialog opened.",
+      "printing": "Printing on {{printer}}.",
+      "pdfHint": "In the dialog, open the PDF menu and choose “Save as PDF”.",
+      "dialogFailed": "Couldn't open the dialog.",
+      "pdfSaved": "PDF saved to Documents › Morning Paper › {{file}}"
+    },
+    "noHistory": "Previous editions show up here."
+  },
+  "printer": {
+    "status": {
+      "ready": "Ready",
+      "printing": "Printing",
+      "offline": "Off",
+      "pdf": "Saved as PDF"
+    },
+    "statusLower": {
+      "ready": "ready",
+      "printing": "printing",
+      "offline": "off",
+      "pdf": "saved as PDF"
+    },
+    "connection": {
+      "usb": "USB",
+      "network": "Network",
+      "local": "Local"
+    },
+    "offlineHint": "off — turn the printer on",
+    "pdfName": "Save as PDF",
+    "pdfMeta": "No printer — choose where to save in the dialog"
+  },
+  "sources": {
+    "eyebrow": "Your editorial desk",
+    "title": "Your sources",
+    "lead": "Pick only the places you trust. Morning Paper reads everything overnight and merges repeated stories.",
+    "caption": "News sources",
+    "col": {
+      "source": "Source",
+      "section": "Section",
+      "status": "Status",
+      "today": "Stories today",
+      "priority": "Priority",
+      "actions": "Actions"
+    },
+    "status": {
+      "ok": "Connected",
+      "new": "First read tomorrow",
+      "paused": "Paused",
+      "error": "No response since {{time}}"
+    },
+    "optionsFor": "Options for {{name}}",
+    "menu": {
+      "priority": "Priority",
+      "pause": "Pause source",
+      "resume": "Resume source",
+      "openSite": "Open website",
+      "remove": "Remove source…"
+    },
+    "empty": {
+      "title": "Your first newspaper",
+      "text": "Pick a few sources and your first edition shows up here early tomorrow.",
+      "action": "Add sources"
+    },
+    "remove": {
+      "title": "Remove {{name}}?",
+      "text": "News from {{name}} will no longer appear in upcoming editions. You can add it again whenever you want.",
+      "cancel": "Cancel",
+      "confirm": "Remove source"
+    },
+    "add": {
+      "eyebrow": "One source at a time",
+      "title": "Add source",
+      "close": "Close",
+      "required": "(required)",
+      "name": "Name",
+      "url": "Feed address (RSS)",
+      "urlHint": "It can be the feed address (RSS/Atom) or the website's page.",
+      "section": "Section",
+      "priority": "Priority",
+      "cancel": "Cancel",
+      "submit": "Add source",
+      "missing_one": "1 thing is missing:",
+      "missing_other": "{{count}} things are missing:",
+      "err": {
+        "urlEmpty": "Paste the RSS feed address.",
+        "urlInvalid": "The address must start with https:// — check that you copied the whole link.",
+        "notFeed": "I couldn't find a news feed at that address."
+      },
+      "nameHint": "Optional: if left blank, we use the feed's own name.",
+      "checking": "Checking the feed…"
+    },
+    "toast": {
+      "priority": "{{name}}: {{priority}} priority.",
+      "paused": "{{name}} paused. It won't appear in upcoming editions.",
+      "resumed": "{{name}} is back in the edition.",
+      "removed": "{{name}} was removed.",
+      "imported_one": "{{count}} source imported from {{file}}.",
+      "imported_other": "{{count}} sources imported from {{file}}.",
+      "noneImported": "No new feeds found in {{file}}.",
+      "added_one": "{{name}} added: {{count}} story in the feed right now.",
+      "added_other": "{{name}} added: {{count}} stories in the feed right now.",
+      "checked_one": "{{count}} source responded.",
+      "checked_other": "All {{count}} sources responded.",
+      "checkedWithErrors": "{{ok}} sources responded, {{failed}} with problems."
+    },
+    "local": {
+      "title": "News from your city",
+      "text": "Type the city where you live and Morning Paper looks up what local papers and sites published about it.",
+      "city": "City",
+      "placeholder": "E.g. Portland, Oregon",
+      "hint": "You can add the state or country to avoid cities with the same name.",
+      "add": "Find news",
+      "name": "News from {{city}}",
+      "notFound": "I couldn't find recent news about that city. Check the name and try again.",
+      "exists": "{{city}} is already in your sources.",
+      "current_one": "City in your sources: {{list}}",
+      "current_other": "Cities in your sources: {{list}}"
+    }
+  },
+  "prefs": {
+    "eyebrow": "Only what matters",
+    "title": "Preferences",
+    "lead": "Set it up once. Then just wake up and read. Everything is saved automatically.",
+    "morning": {
+      "title": "Morning edition",
+      "time": "Time",
+      "repeat": "Frequency",
+      "repeatDaily": "Every day",
+      "repeatInterval": "Every few days",
+      "repeatWeekdays": "On some weekdays",
+      "every": "Every",
+      "everyOption": "{{count}} days",
+      "days": "Weekdays",
+      "noDays": "Pick at least one day.",
+      "nextNote": "Next edition: {{when}} at {{time}}.",
+      "length": "Edition length",
+      "lengthOption": "{{count}} pp.",
+      "lengthNote": "Applies from the next edition.",
+      "pdf": "Prepare PDF",
+      "send": "Send to the printer"
+    },
+    "printer": {
+      "title": "Default printer",
+      "note": "Each morning's edition goes straight to it.",
+      "ask": "Ask which printer to use every time",
+      "scan": "Find printers",
+      "scanning": "Searching…"
+    },
+    "topics": {
+      "title": "What you want to read",
+      "note": "When you move one topic, the others adjust to add up to 100%.",
+      "total": "Total"
+    },
+    "style": {
+      "title": "Newspaper style",
+      "note": "The front page on Today changes right away. Printing stays black and white."
+    },
+    "background": {
+      "title": "In the background",
+      "note": "Morning Paper doesn't need to stay open. It prepares and prints the edition on its own.",
+      "login": "Open at login",
+      "loginNote": "Starts quietly, without opening the window",
+      "keep": "Keep running when the window is closed",
+      "keepNote": "Closing the window doesn't stop tomorrow's edition",
+      "wake": "Wake the Mac to generate the edition",
+      "wakeNote": "If it's asleep, it wakes up for a few minutes",
+      "menubar": "Show in the menu bar",
+      "menubarNote": "Shortcut to print, generate or pause without opening the app",
+      "dock": "Hide from the Dock while the window is open too",
+      "dockNote": "When you close the window, the app already leaves the Dock and stays in the menu bar",
+      "dockDisabled": "Available when the menu bar shortcut is on"
+    },
+    "ai": {
+      "title": "Summarizing assistant",
+      "note1": "AI is optional. It merges the same story from several sources, writes short summaries and suggests the headline. Without AI, the newspaper uses each source's own summary and sorts by time and priority.",
+      "note2": "Morning Paper doesn't ask for an API key: it uses a command-line assistant already installed and signed in on your Mac.",
+      "none": "No AI",
+      "notes": {
+        "claude": "Uses your Claude account",
+        "codex": "Uses your OpenAI account",
+        "gemini": "Uses your Google account",
+        "ollama": "Runs on your Mac, sends no data",
+        "opencode": "Uses the provider configured in it",
+        "none": "Uses each source's summary"
+      },
+      "notInPath": "{{cmd}} is not in PATH",
+      "notFound": "Not found on this Mac. Install it and click Search again.",
+      "found": "Found",
+      "notInstalled": "Not installed",
+      "rescan": "Search again",
+      "searching": "Looking for installed assistants…",
+      "foundCount_one": "{{count}} assistant found on this Mac.",
+      "foundCount_other": "{{count}} assistants found on this Mac."
+    },
+    "advanced": {
+      "title": "Advanced",
+      "appLang": "App language",
+      "appLangNote": "Follows the macOS language ({{lang}}). To change it, go to System Settings › General › Language & Region.",
+      "editionLang": "Edition language",
+      "langs": {
+        "auto": "Same as the Mac",
+        "pt-BR": "Português (Brasil)",
+        "en": "English",
+        "es": "Español"
+      }
+    },
+    "toast": {
+      "time": "Upcoming editions at {{time}}.",
+      "length": "From tomorrow: {{count}} pages.",
+      "printer": "Default printer: {{printer}}.",
+      "style": "{{style}} style applied to the edition.",
+      "noAi": "No AI: the newspaper will use each source's summary.",
+      "ai": "The next edition will be summarized by {{name}}.",
+      "printersFound_one": "{{count}} new printer found.",
+      "printersFound_other": "{{count}} new printers found.",
+      "noPrinters": "No new printers found on the network.",
+      "printersFailed": "Couldn't list the printers.",
+      "wake": "Your Mac will wake 5 minutes before {{time}}.",
+      "wakeFailed": "Wake wasn't turned on (the administrator password is required).",
+      "repeat": "Next edition: {{when}} at {{time}}."
+    }
+  },
+  "palette": {
+    "label": "Commands",
+    "placeholder": "Type a command…",
+    "search": "Search commands",
+    "empty": "No command matching “{{query}}”.",
+    "hint": {
+      "navigate": "Go to",
+      "action": "Action",
+      "prefs": "Preferences"
+    },
+    "cmd": {
+      "today": "Go to Today",
+      "read": "Read the edition",
+      "review": "Review stories",
+      "printNow": "Print now",
+      "savePdf": "Save PDF",
+      "addSource": "Add source",
+      "sources": "See sources",
+      "style": "Change newspaper style",
+      "time": "Change edition time",
+      "printer": "Choose default printer",
+      "prefs": "Open preferences",
+      "generate": "Generate a new edition now"
+    }
+  },
+  "tray": {
+    "ready": "Edition #{{n}} ready",
+    "paused": "Next edition skipped",
+    "generating": "Generating a new edition…",
+    "extraReady": "Extra edition ready to review",
+    "detail": "Next: {{when}} at {{time}} · {{printer}}",
+    "open": "Open Morning Paper",
+    "print": "Print today's edition",
+    "generate": "Generate a new edition now",
+    "pause": "Skip the next edition",
+    "resume": "Resume deliveries",
+    "prefs": "Preferences…",
+    "quit": "Quit Morning Paper",
+    "toast": {
+      "extra": "An extra edition is ready to review.",
+      "paused": "The {{when}} edition won't come out. Then it goes back to normal.",
+      "resumed": "Deliveries resumed."
+    },
+    "none": "No edition yet"
+  },
+  "compose": {
+    "frontSection": "Front page",
+    "inBrief": "In brief",
+    "alsoRead": "Also read",
+    "inThisEdition": "In this edition",
+    "pageRef": "{{section}} · page {{page}}",
+    "seePage": "Page {{page}}.",
+    "alsoIn": "Also in {{section}}",
+    "and": " & ",
+    "byline_one": "{{sources}}",
+    "byline_other": "{{sources}} · summary of {{count}} sources",
+    "photoCredit": "Photo: {{source}}"
+  },
+  "generate": {
+    "now": "Generate edition now",
+    "again": "Generate new edition",
+    "running": "Generating…",
+    "ready": "Edition #{{n}} is ready.",
+    "aiFailed": "The AI didn't respond ({{error}}). I used the sources' summaries.",
+    "inProgress": "Putting your edition together",
+    "hint": "You can keep using the app; the front page shows up here when it's done.",
+    "step": {
+      "collecting": "Reading your sources…",
+      "grouping": "Merging repeated stories and picking the lineup…",
+      "summarizing": "Writing summaries with {{name}}…",
+      "building": "Laying out the pages…"
+    },
+    "error": {
+      "noSources": "No active sources. Add or resume a source in Sources.",
+      "noNews": "No news from the last 36 hours in your sources.",
+      "unknown": "Couldn't generate the edition: {{error}}",
+      "save": "Couldn't save the edition to disk."
+    }
+  },
+  "delivery": {
+    "title": "Edition #{{n}} is ready",
+    "printed": "Sent to {{printer}}. Good morning!",
+    "ready": "Your newspaper is ready to read.",
+    "failed": "The edition is out, but delivery failed: {{error}}"
+  },
+  "onboarding": {
+    "stepOf": "Step {{step}} of {{total}}",
+    "back": "Back",
+    "next": "Continue",
+    "start": "Get started",
+    "welcome": {
+      "title": "Your newspaper, printed every morning.",
+      "lead": "Morning Paper reads the sources you trust, merges repeated stories and delivers a calm black-and-white edition before you wake up.",
+      "collect": "Reads your sources overnight",
+      "collectDetail": "Any site with RSS: newspapers, blogs, magazines.",
+      "summarize": "Summarizes with the AI you already use",
+      "summarizeDetail": "Claude, Codex, Gemini, Ollama… or no AI.",
+      "print": "Prints on its own on A4",
+      "printDetail": "Or saves a PDF. Takes under 2 minutes to set up."
+    },
+    "sources": {
+      "eyebrow": "Your sources",
+      "title": "Where does the news come from?",
+      "lead": "Check the outlets you trust. You can change them later in Sources.",
+      "needOne": "Pick at least one source.",
+      "suggested": "Suggestions",
+      "selected": "Selected",
+      "count_one": "{{count}} source selected.",
+      "count_other": "{{count}} sources selected.",
+      "own": "Another source",
+      "urlPlaceholder": "https://site.com or the feed address",
+      "urlHint": "Paste a website or RSS feed address. We check it right away.",
+      "notFeed": "I couldn't find a news feed at that address.",
+      "add": "Add",
+      "importOpml": "Import from an RSS reader (OPML)"
+    },
+    "edition": {
+      "eyebrow": "Your edition",
+      "title": "When and how much to read?",
+      "lead": "Choose the time, the length and the weight of each topic."
+    },
+    "printer": {
+      "eyebrow": "Printing",
+      "title": "Where to print?",
+      "lead": "The morning edition goes straight to this printer. Without a printer, it's saved as a PDF."
+    },
+    "assistant": {
+      "eyebrow": "Summaries",
+      "title": "Who writes the summaries?",
+      "lead": "Optional. We use an AI assistant already installed on your Mac; without AI, the paper uses the sources' text."
+    },
+    "background": {
+      "eyebrow": "Background",
+      "title": "Let it work on its own.",
+      "lead": "So the edition comes out on time, the app runs quietly in the menu bar."
+    },
+    "finish": {
+      "eyebrow": "All set",
+      "title": "Your newspaper is set up.",
+      "lead": "From tomorrow, the edition comes out at {{time}}. Want to see the first one now?",
+      "sources_one": "{{count}} source",
+      "sources_other": "{{count}} sources",
+      "generate": "Generate my first edition",
+      "later": "Wait until tomorrow at {{time}}",
+      "note": "The first edition uses news from the last 36 hours."
+    }
+  },
+  "when": {
+    "today": "today",
+    "tomorrow": "tomorrow"
+  },
+  "errorBoundary": {
+    "eyebrow": "Something went wrong",
+    "title": "This screen didn't open.",
+    "text": "Your editions and preferences are still saved. Reload the app or go to another screen from the sidebar.",
+    "reload": "Reload"
+  }
+}

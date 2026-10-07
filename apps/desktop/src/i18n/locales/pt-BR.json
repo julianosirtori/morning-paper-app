@@ -1,0 +1,602 @@
+{
+  "app": {
+    "tagline": "Seu jornal, toda manhã",
+    "footerTitle": "Open source · v{{version}}",
+    "footerNote": "Seus dados ficam no seu Mac."
+  },
+  "nav": {
+    "label": "Principal",
+    "groupRead": "Ler e imprimir",
+    "groupSetup": "Configurar",
+    "today": "Hoje",
+    "edition": "Edição",
+    "review": "Revisar",
+    "print": "Imprimir",
+    "sources": "Fontes",
+    "preferences": "Preferências"
+  },
+  "toolbar": {
+    "openCommands": "Abrir comandos (Command K)",
+    "today": {
+      "meta": "Edição #{{n}} · pronta · {{count}} notícias",
+      "review": "Revisar notícias",
+      "print": "Imprimir jornal",
+      "empty": "Nenhuma edição ainda"
+    },
+    "edition": {
+      "meta": "#{{n}} · página {{page}} de {{total}} · estilo {{style}}",
+      "pdf": "Baixar PDF",
+      "print": "Imprimir"
+    },
+    "review": {
+      "meta": "{{included}} de {{total}} notícias na edição",
+      "final": "Ver edição final"
+    },
+    "print": {
+      "pdf": "Salvar PDF",
+      "now": "Imprimir agora",
+      "sending": "Enviando…"
+    },
+    "sources": {
+      "meta": "{{active}} ativas de {{total}}",
+      "import": "Importar OPML",
+      "add": "Adicionar fonte",
+      "check": "Verificar fontes"
+    },
+    "preferences": {
+      "meta": "Salvas automaticamente"
+    }
+  },
+  "sections": {
+    "world": "Mundo",
+    "brazil": "Brasil",
+    "business": "Negócios",
+    "tech": "Tecnologia",
+    "science": "Ciência",
+    "culture": "Cultura",
+    "sports": "Esportes",
+    "local": "Sua cidade"
+  },
+  "priority": {
+    "high": "Alta",
+    "medium": "Média",
+    "low": "Baixa"
+  },
+  "styles": {
+    "classic": {
+      "name": "Clássico",
+      "description": "Jornal tradicional"
+    },
+    "modern": {
+      "name": "Moderno",
+      "description": "Editorial contemporâneo"
+    },
+    "financial": {
+      "name": "Financeiro",
+      "description": "Denso e direto"
+    },
+    "minimal": {
+      "name": "Minimalista",
+      "description": "Só tipografia"
+    }
+  },
+  "newspaper": {
+    "privatePaper": "Seu jornal particular",
+    "bwA4": "Preto e branco · A4",
+    "editionNumber": "Edição {{n}}",
+    "pageCount": "{{count}} páginas",
+    "dateline": "Notícias de ontem, lidas com calma",
+    "editionPage": "Edição {{n}} · página {{page}}",
+    "briefs": "Curtas",
+    "footer": "Morning Paper · sua edição particular",
+    "pageLabel": "Página {{page}} de {{total}}: {{section}}"
+  },
+  "today": {
+    "eyebrow": "{{date}} · Edição #{{n}}",
+    "title": "Seu jornal está pronto.",
+    "lead": "As notícias importantes de ontem, organizadas para você ler com calma hoje.",
+    "openFront": "Abrir a edição de hoje para ler",
+    "frontHint": "Primeira página · clique para ler as {{count}} páginas",
+    "styleLabel": "Estilo {{style}}",
+    "factsTitle": "Edição de hoje",
+    "facts": {
+      "pages": "Páginas",
+      "pagesValue": "{{count}} · A4 · preto e branco",
+      "articles": "Notícias",
+      "articlesValue": "{{count}} incluídas",
+      "sources": "Fontes",
+      "sourcesValue": "{{count}} ativas",
+      "assistant": "Assistente",
+      "printer": "Impressora"
+    },
+    "timelineTitle": "Enquanto você dormia",
+    "timeline": {
+      "collected": "Notícias coletadas",
+      "grouped": "Repetições agrupadas",
+      "built": "Edição montada",
+      "builtDetail": "Resumos e capa no estilo {{style}}",
+      "pdf": "PDF salvo",
+      "sent": "Enviado para impressão",
+      "collectedDetail_one": "{{count}} fonte lida",
+      "collectedDetail_other": "{{count}} fontes lidas",
+      "groupedDetail_one": "{{count}} notícia repetida virou uma só",
+      "groupedDetail_other": "{{count}} notícias repetidas viraram uma só",
+      "summarized": "Resumos escritos",
+      "summarizedDetail": "Pelo {{name}}"
+    },
+    "next": "Próxima edição",
+    "nextTitle": "A próxima edição chega {{when}} às {{time}}.",
+    "nextText": "Você não precisa deixar o app aberto. Ele coleta, organiza e imprime sozinho.",
+    "changeTime": "Alterar horário",
+    "emptyTitle": "Sua primeira edição",
+    "emptyLead": "Assim que as notícias forem coletadas, a capa aparece aqui.",
+    "emptyText": "A próxima edição sai sozinha {{when}} às {{time}}. Se quiser, gere uma agora com as notícias das últimas horas.",
+    "emptyNoSources": "Escolha pelo menos uma fonte para o Morning Paper ter o que ler.",
+    "addSources": "Escolher fontes",
+    "oldTitle": "Sua última edição.",
+    "oldLead": "A edição de hoje ainda não saiu. Enquanto isso, aqui está a mais recente.",
+    "timelineTitleManual": "Como esta edição foi feita",
+    "pausedTitle": "A edição de {{when}} foi pulada. Depois volta ao normal.",
+    "aiSkipped": "O assistente de IA não respondeu; a edição usou o resumo das próprias fontes."
+  },
+  "edition": {
+    "eyebrow": "{{date}} · Edição #{{n}}",
+    "title": "Leia sua edição.",
+    "lead": "Folheie como um jornal de verdade. Use as setas ← → do teclado para virar a página.",
+    "backToToday": "Voltar para a edição de hoje",
+    "pagesNav": "Páginas da edição",
+    "thumb": "Página {{page}}: {{section}}",
+    "stage": "Página em leitura",
+    "controls": "Controles de leitura",
+    "pageOf": "Página {{page}} de {{total}}",
+    "previous": "← Anterior",
+    "next": "Próxima →",
+    "size": "Tamanho",
+    "zoomOut": "Diminuir",
+    "zoomIn": "Aumentar",
+    "style": "Estilo da edição",
+    "change": "Trocar"
+  },
+  "review": {
+    "eyebrow": "{{included}} de {{total}} notícias na edição",
+    "title": "Revise antes de imprimir.",
+    "lead": "Se algo não parece importante para você, tire da edição. Dá para trazer de volta quando quiser.",
+    "importance": {
+      "high": "importância alta",
+      "medium": "importância média",
+      "low": "importância baixa"
+    },
+    "headlineBadge": "Manchete da capa",
+    "openAt": "Abrir em {{source}} ↗",
+    "inEdition": "Na edição",
+    "outOfEdition": "Fora da edição",
+    "remove": "Tirar da edição",
+    "putBack": "Colocar de volta",
+    "headlineLocked": "A manchete não pode sair. Escolha outra antes.",
+    "editSummary": "Editar resumo",
+    "makeHeadline": "Virar manchete",
+    "section": "Seção",
+    "summaryOf": "Resumo de “{{title}}”",
+    "saveSummary": "Salvar resumo",
+    "cancel": "Cancelar",
+    "toast": {
+      "removed": "Notícia tirada da edição.",
+      "back": "Notícia de volta na edição.",
+      "saved": "Resumo salvo.",
+      "headline": "Nova manchete na capa.",
+      "moved": "Movida para {{section}}."
+    }
+  },
+  "print": {
+    "eyebrow": "Tudo pronto",
+    "title": "Imprima seu jornal.",
+    "lead": "A edição de hoje está preparada em preto e branco, no tamanho A4, para gastar pouca tinta.",
+    "facts": {
+      "edition": "Edição",
+      "format": "Formato",
+      "formatValue": "{{count}} páginas · A4",
+      "color": "Cor",
+      "colorValue": "Preto e branco",
+      "printer": "Impressora",
+      "status": "Status"
+    },
+    "change": "Alterar",
+    "copies": "Cópias",
+    "lessCopy": "Menos uma cópia",
+    "moreCopy": "Mais uma cópia",
+    "range": "O que imprimir",
+    "rangeAll": "Todas as {{count}} páginas",
+    "rangeFront": "Só a primeira página",
+    "chooseAnother": "escolha outra",
+    "history": "Edições anteriores",
+    "historyItem": "#{{n}} · {{count}} páginas →",
+    "msg": {
+      "offline": "A {{printer}} está desligada. Ligue a impressora e tente de novo, ou",
+      "pdf": "PDF pronto: escolha “Salvar como PDF” no diálogo. Sugestão de nome: morning-paper-{{n}}.pdf",
+      "sent_one": "Enviado para {{printer}}: {{count}} cópia, {{what}}.",
+      "sent_other": "Enviado para {{printer}}: {{count}} cópias, {{what}}.",
+      "whatFront": "só a primeira página",
+      "whatAll": "{{count}} páginas",
+      "failed": "O diálogo de impressão não abriu. Tente de novo."
+    },
+    "toast": {
+      "failed": "Não foi possível imprimir.",
+      "pdfOpen": "Diálogo de PDF aberto.",
+      "printing": "Imprimindo na {{printer}}.",
+      "pdfHint": "No diálogo, abra o menu PDF e escolha “Salvar como PDF”.",
+      "dialogFailed": "Não foi possível abrir o diálogo.",
+      "pdfSaved": "PDF salvo em Documentos › Morning Paper › {{file}}"
+    },
+    "noHistory": "As edições anteriores aparecem aqui."
+  },
+  "printer": {
+    "status": {
+      "ready": "Pronta",
+      "printing": "Imprimindo",
+      "offline": "Desligada",
+      "pdf": "Salva em PDF"
+    },
+    "statusLower": {
+      "ready": "pronta",
+      "printing": "imprimindo",
+      "offline": "desligada",
+      "pdf": "salva em PDF"
+    },
+    "connection": {
+      "usb": "USB",
+      "network": "Rede",
+      "local": "Local"
+    },
+    "offlineHint": "desligada — ligue a impressora",
+    "pdfName": "Salvar como PDF",
+    "pdfMeta": "Sem impressora — escolha onde salvar no diálogo"
+  },
+  "sources": {
+    "eyebrow": "Sua mesa editorial",
+    "title": "Suas fontes",
+    "lead": "Escolha só os lugares em que você confia. O Morning Paper lê tudo de madrugada e junta as notícias repetidas.",
+    "caption": "Fontes de notícias",
+    "col": {
+      "source": "Fonte",
+      "section": "Seção",
+      "status": "Situação",
+      "today": "Artigos hoje",
+      "priority": "Prioridade",
+      "actions": "Ações"
+    },
+    "status": {
+      "ok": "Conectada",
+      "new": "Primeira leitura amanhã",
+      "paused": "Pausada",
+      "error": "Sem resposta desde {{time}}"
+    },
+    "optionsFor": "Opções para {{name}}",
+    "menu": {
+      "priority": "Prioridade",
+      "pause": "Pausar fonte",
+      "resume": "Retomar fonte",
+      "openSite": "Abrir site",
+      "remove": "Remover fonte…"
+    },
+    "empty": {
+      "title": "Seu primeiro jornal",
+      "text": "Escolha algumas fontes e a sua primeira edição aparece aqui amanhã cedo.",
+      "action": "Adicionar fontes"
+    },
+    "remove": {
+      "title": "Remover {{name}}?",
+      "text": "As notícias de {{name}} deixam de entrar nas próximas edições. Você pode adicionar de novo quando quiser.",
+      "cancel": "Cancelar",
+      "confirm": "Remover fonte"
+    },
+    "add": {
+      "eyebrow": "Uma fonte de cada vez",
+      "title": "Adicionar fonte",
+      "close": "Fechar",
+      "required": "(obrigatório)",
+      "name": "Nome",
+      "url": "Endereço do feed (RSS)",
+      "urlHint": "Pode ser o endereço do feed (RSS/Atom) ou da página do site.",
+      "section": "Seção",
+      "priority": "Prioridade",
+      "cancel": "Cancelar",
+      "submit": "Adicionar fonte",
+      "missing_one": "Falta 1 informação:",
+      "missing_other": "Faltam {{count}} informações:",
+      "err": {
+        "urlEmpty": "Cole o endereço do feed RSS.",
+        "urlInvalid": "O endereço precisa começar com https:// — confira se copiou o link inteiro.",
+        "notFeed": "Não encontrei um feed de notícias nesse endereço."
+      },
+      "nameHint": "Opcional: se ficar em branco, usamos o nome do próprio feed.",
+      "checking": "Conferindo o feed…"
+    },
+    "toast": {
+      "priority": "{{name}}: prioridade {{priority}}.",
+      "paused": "{{name}} pausada. Ela não entra nas próximas edições.",
+      "resumed": "{{name}} voltou para a edição.",
+      "removed": "{{name}} foi removida.",
+      "imported_one": "{{count}} fonte importada de {{file}}.",
+      "imported_other": "{{count}} fontes importadas de {{file}}.",
+      "noneImported": "Nenhum feed novo encontrado em {{file}}.",
+      "added_one": "{{name}} adicionada: {{count}} notícia no feed agora.",
+      "added_other": "{{name}} adicionada: {{count}} notícias no feed agora.",
+      "checked_one": "{{count}} fonte respondeu.",
+      "checked_other": "Todas as {{count}} fontes responderam.",
+      "checkedWithErrors": "{{ok}} fontes responderam, {{failed}} com problema."
+    },
+    "local": {
+      "title": "Notícias da sua cidade",
+      "text": "Digite a cidade onde você mora e o Morning Paper busca o que os jornais e sites locais publicaram sobre ela.",
+      "city": "Cidade",
+      "placeholder": "Ex.: Porto Alegre, RS",
+      "hint": "Pode incluir o estado para evitar cidades com o mesmo nome.",
+      "add": "Buscar notícias",
+      "name": "Notícias de {{city}}",
+      "notFound": "Não encontrei notícias recentes sobre essa cidade. Confira o nome e tente de novo.",
+      "exists": "{{city}} já está nas suas fontes.",
+      "current_one": "Cidade nas fontes: {{list}}",
+      "current_other": "Cidades nas fontes: {{list}}"
+    }
+  },
+  "prefs": {
+    "eyebrow": "Só o necessário",
+    "title": "Preferências",
+    "lead": "Ajuste uma vez. Depois é só acordar e ler. Tudo é salvo automaticamente.",
+    "morning": {
+      "title": "Edição da manhã",
+      "time": "Horário",
+      "repeat": "Frequência",
+      "repeatDaily": "Todos os dias",
+      "repeatInterval": "A cada alguns dias",
+      "repeatWeekdays": "Em alguns dias da semana",
+      "every": "A cada",
+      "everyOption": "{{count}} dias",
+      "days": "Dias da semana",
+      "noDays": "Escolha pelo menos um dia.",
+      "nextNote": "Próxima edição: {{when}} às {{time}}.",
+      "length": "Tamanho da edição",
+      "lengthOption": "{{count}} pág.",
+      "lengthNote": "Vale a partir da próxima edição.",
+      "pdf": "Preparar PDF",
+      "send": "Enviar para a impressora"
+    },
+    "printer": {
+      "title": "Impressora padrão",
+      "note": "A edição de cada manhã vai direto para ela.",
+      "ask": "Perguntar qual impressora usar toda vez",
+      "scan": "Procurar impressoras",
+      "scanning": "Procurando…"
+    },
+    "topics": {
+      "title": "O que você quer ler",
+      "note": "Ao mexer em um assunto, os outros se ajustam para somar 100%.",
+      "total": "Total"
+    },
+    "style": {
+      "title": "Estilo do jornal",
+      "note": "A capa na tela Hoje muda na hora. A impressão continua em preto e branco."
+    },
+    "background": {
+      "title": "Em segundo plano",
+      "note": "O Morning Paper não precisa ficar aberto. Ele prepara e imprime a edição sozinho.",
+      "login": "Abrir ao iniciar o Mac",
+      "loginNote": "Começa discretamente, sem abrir a janela",
+      "keep": "Continuar rodando ao fechar a janela",
+      "keepNote": "Fechar a janela não interrompe a edição de amanhã",
+      "wake": "Acordar o Mac para gerar a edição",
+      "wakeNote": "Se estiver em repouso, ele acorda por alguns minutos",
+      "menubar": "Mostrar na barra de menus",
+      "menubarNote": "Atalho para imprimir, gerar ou pausar sem abrir o app",
+      "dock": "Ocultar do Dock também com a janela aberta",
+      "dockNote": "Ao fechar a janela, o app já sai do Dock e fica só na barra de menus",
+      "dockDisabled": "Disponível quando o atalho na barra de menus estiver ativo"
+    },
+    "ai": {
+      "title": "Assistente para resumir",
+      "note1": "A IA é opcional. Ela junta a mesma notícia de várias fontes, escreve resumos curtos e sugere a manchete. Sem IA, o jornal usa o resumo que cada fonte publica e ordena por horário e prioridade.",
+      "note2": "O Morning Paper não pede chave de API: ele usa um assistente de linha de comando já instalado e logado no seu Mac.",
+      "none": "Sem IA",
+      "notes": {
+        "claude": "Usa a sua conta do Claude",
+        "codex": "Usa a sua conta da OpenAI",
+        "gemini": "Usa a sua conta do Google",
+        "ollama": "Roda no seu Mac, sem enviar dados",
+        "opencode": "Usa o provedor configurado nele",
+        "none": "Usa o resumo de cada fonte"
+      },
+      "notInPath": "{{cmd}} não está no PATH",
+      "notFound": "Não encontrado neste Mac. Instale e clique em Procurar de novo.",
+      "found": "Encontrado",
+      "notInstalled": "Não instalado",
+      "rescan": "Procurar de novo",
+      "searching": "Procurando assistentes instalados…",
+      "foundCount_one": "{{count}} assistente encontrado neste Mac.",
+      "foundCount_other": "{{count}} assistentes encontrados neste Mac."
+    },
+    "advanced": {
+      "title": "Avançado",
+      "appLang": "Idioma do aplicativo",
+      "appLangNote": "Segue o idioma do macOS ({{lang}}). Para mudar, altere em Ajustes do Sistema › Geral › Idioma e Região.",
+      "editionLang": "Idioma da edição",
+      "langs": {
+        "auto": "Igual ao do Mac",
+        "pt-BR": "Português (Brasil)",
+        "en": "English",
+        "es": "Español"
+      }
+    },
+    "toast": {
+      "time": "Próximas edições às {{time}}.",
+      "length": "A partir de amanhã: {{count}} páginas.",
+      "printer": "Impressora padrão: {{printer}}.",
+      "style": "Estilo {{style}} aplicado à edição.",
+      "noAi": "Sem IA: o jornal vai usar o resumo de cada fonte.",
+      "ai": "A próxima edição será resumida pelo {{name}}.",
+      "printersFound_one": "{{count}} impressora nova encontrada.",
+      "printersFound_other": "{{count}} impressoras novas encontradas.",
+      "noPrinters": "Nenhuma impressora nova encontrada na rede.",
+      "printersFailed": "Não foi possível listar as impressoras.",
+      "wake": "O Mac vai acordar às {{time}} menos 5 minutos.",
+      "wakeFailed": "O despertar não foi ativado (a senha de administrador é necessária).",
+      "repeat": "Próxima edição: {{when}} às {{time}}."
+    }
+  },
+  "palette": {
+    "label": "Comandos",
+    "placeholder": "Digite um comando…",
+    "search": "Buscar comando",
+    "empty": "Nenhum comando com “{{query}}”.",
+    "hint": {
+      "navigate": "Navegar",
+      "action": "Ação",
+      "prefs": "Preferências"
+    },
+    "cmd": {
+      "today": "Ir para Hoje",
+      "read": "Ler a edição",
+      "review": "Revisar notícias",
+      "printNow": "Imprimir agora",
+      "savePdf": "Salvar PDF",
+      "addSource": "Adicionar fonte",
+      "sources": "Ver fontes",
+      "style": "Trocar estilo do jornal",
+      "time": "Alterar horário da edição",
+      "printer": "Escolher impressora padrão",
+      "prefs": "Abrir preferências",
+      "generate": "Gerar nova edição agora"
+    }
+  },
+  "tray": {
+    "ready": "Edição #{{n}} pronta",
+    "paused": "Próxima edição pulada",
+    "generating": "Gerando nova edição…",
+    "extraReady": "Edição extra pronta para revisar",
+    "detail": "Próxima: {{when}} às {{time}} · {{printer}}",
+    "open": "Abrir Morning Paper",
+    "print": "Imprimir edição de hoje",
+    "generate": "Gerar nova edição agora",
+    "pause": "Pular a próxima edição",
+    "resume": "Retomar entregas",
+    "prefs": "Preferências…",
+    "quit": "Sair do Morning Paper",
+    "toast": {
+      "extra": "Uma edição extra está pronta para revisar.",
+      "paused": "A edição de {{when}} não vai sair. Depois volta ao normal.",
+      "resumed": "Entregas retomadas."
+    },
+    "none": "Nenhuma edição ainda"
+  },
+  "compose": {
+    "frontSection": "Capa",
+    "inBrief": "Em resumo",
+    "alsoRead": "Leia também",
+    "inThisEdition": "Nesta edição",
+    "pageRef": "{{section}} · página {{page}}",
+    "seePage": "Página {{page}}.",
+    "alsoIn": "Também em {{section}}",
+    "and": " e ",
+    "byline_one": "{{sources}}",
+    "byline_other": "{{sources}} · resumo de {{count}} fontes",
+    "photoCredit": "Foto: {{source}}"
+  },
+  "generate": {
+    "now": "Gerar edição agora",
+    "again": "Gerar nova edição",
+    "running": "Gerando…",
+    "ready": "Edição #{{n}} pronta.",
+    "aiFailed": "A IA não respondeu ({{error}}). Usei o resumo das fontes.",
+    "inProgress": "Montando sua edição",
+    "hint": "Pode continuar usando o app; a capa aparece aqui quando terminar.",
+    "step": {
+      "collecting": "Lendo as suas fontes…",
+      "grouping": "Juntando notícias repetidas e escolhendo a pauta…",
+      "summarizing": "Escrevendo os resumos com o {{name}}…",
+      "building": "Diagramando as páginas…"
+    },
+    "error": {
+      "noSources": "Nenhuma fonte ativa. Adicione ou retome uma fonte em Fontes.",
+      "noNews": "Nenhuma notícia das últimas 36 horas nas suas fontes.",
+      "unknown": "Não foi possível gerar a edição: {{error}}",
+      "save": "Não foi possível salvar a edição no disco."
+    }
+  },
+  "delivery": {
+    "title": "Edição #{{n}} pronta",
+    "printed": "Enviada para {{printer}}. Bom dia!",
+    "ready": "Seu jornal está pronto para ler.",
+    "failed": "A edição saiu, mas a entrega falhou: {{error}}"
+  },
+  "onboarding": {
+    "stepOf": "Passo {{step}} de {{total}}",
+    "back": "Voltar",
+    "next": "Continuar",
+    "start": "Começar",
+    "welcome": {
+      "title": "Seu jornal, impresso toda manhã.",
+      "lead": "O Morning Paper lê as fontes em que você confia, junta as notícias repetidas e entrega uma edição calma, em preto e branco, antes de você acordar.",
+      "collect": "Lê suas fontes de madrugada",
+      "collectDetail": "Qualquer site com RSS: jornais, blogs, revistas.",
+      "summarize": "Resume com a IA que você já usa",
+      "summarizeDetail": "Claude, Codex, Gemini, Ollama… ou sem IA.",
+      "print": "Imprime sozinho em A4",
+      "printDetail": "Ou salva em PDF. Leva menos de 2 minutos para configurar."
+    },
+    "sources": {
+      "eyebrow": "Suas fontes",
+      "title": "De onde vêm as notícias?",
+      "lead": "Marque os veículos em que você confia. Dá para mudar depois em Fontes.",
+      "needOne": "Escolha pelo menos uma fonte.",
+      "suggested": "Sugestões",
+      "selected": "Selecionada",
+      "count_one": "{{count}} fonte selecionada.",
+      "count_other": "{{count}} fontes selecionadas.",
+      "own": "Outra fonte",
+      "urlPlaceholder": "https://site.com.br ou o endereço do feed",
+      "urlHint": "Cole o endereço de um site ou feed RSS. Nós conferimos na hora.",
+      "notFeed": "Não encontrei um feed de notícias nesse endereço.",
+      "add": "Adicionar",
+      "importOpml": "Importar de um leitor de RSS (OPML)"
+    },
+    "edition": {
+      "eyebrow": "Sua edição",
+      "title": "Quando e quanto ler?",
+      "lead": "Escolha o horário, o tamanho e o peso de cada assunto."
+    },
+    "printer": {
+      "eyebrow": "Impressão",
+      "title": "Onde imprimir?",
+      "lead": "A edição da manhã vai direto para esta impressora. Sem impressora, ela fica salva em PDF."
+    },
+    "assistant": {
+      "eyebrow": "Resumos",
+      "title": "Quem escreve os resumos?",
+      "lead": "Opcional. Usamos um assistente de IA já instalado no seu Mac; sem IA, o jornal usa o texto das fontes."
+    },
+    "background": {
+      "eyebrow": "Segundo plano",
+      "title": "Deixe trabalhando sozinho.",
+      "lead": "Para a edição sair na hora certa, o app roda discretamente na barra de menus."
+    },
+    "finish": {
+      "eyebrow": "Tudo pronto",
+      "title": "Seu jornal está configurado.",
+      "lead": "A partir de amanhã, a edição sai às {{time}}. Quer ver a primeira agora?",
+      "sources_one": "{{count}} fonte",
+      "sources_other": "{{count}} fontes",
+      "generate": "Gerar minha primeira edição",
+      "later": "Esperar até amanhã às {{time}}",
+      "note": "A primeira edição usa as notícias das últimas 36 horas."
+    }
+  },
+  "when": {
+    "today": "hoje",
+    "tomorrow": "amanhã"
+  },
+  "errorBoundary": {
+    "eyebrow": "Algo deu errado",
+    "title": "Esta tela não abriu.",
+    "text": "Suas edições e preferências continuam salvas. Recarregue o app ou volte para outra tela pela barra lateral.",
+    "reload": "Recarregar"
+  }
+}

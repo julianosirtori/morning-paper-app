@@ -1,0 +1,55 @@
+---
+import Icon from "./Icon.astro";
+
+// Mesmas etapas da linha do tempo "Enquanto você dormia" da tela Hoje.
+const timeline = [
+  { time: "05:55", title: "Notícias coletadas", detail: "Todas as fontes ativas são lidas." },
+  { time: "05:56", title: "Repetições agrupadas", detail: "A mesma notícia de várias fontes vira uma só." },
+  { time: "05:57", title: "Resumos escritos", detail: "Pelo assistente de IA que você escolheu, se quiser um." },
+  { time: "05:59", title: "Edição montada", detail: "Capa e páginas no estilo que você escolheu." },
+  { time: "06:00", title: "PDF salvo", detail: "Em Documentos › Morning Paper." },
+  { time: "06:01", title: "Enviado para impressão", detail: "Direto para a sua impressora, sem diálogo." },
+];
+---
+
+<section class="section night" aria-labelledby="h-noite">
+  <div class="wrap">
+    <div class="section-head flush">
+      <span class="eyebrow">Enquanto você dormia</span>
+      <h2 class="h2" id="h-noite">Às 06:01, seu jornal já está na bandeja.</h2>
+      <p class="lede">
+        Você não precisa abrir nada. O Morning Paper fica na barra de menus, trabalha de madrugada e só aparece quando a
+        edição está pronta.
+      </p>
+    </div>
+    <ol class="tl">
+      {
+        timeline.map((t, i) => {
+          const last = i === timeline.length - 1;
+          return (
+            <li class:list={["reveal", { last }]} style={`--i:${i}`}>
+              <time>{t.time}</time>
+              <span class="tl-mark" aria-hidden="true">
+                <Icon name={last ? "print" : "check"} />
+              </span>
+              <div>
+                <b>{t.title}</b>
+                <span class="d">{t.detail}</span>
+              </div>
+            </li>
+          );
+        })
+      }
+    </ol>
+    <div class="wake">
+      <strong>Bom dia.</strong>
+      <div>
+        <p>
+          Se o Mac estiver em repouso, ele acorda alguns minutos antes, monta a edição e volta a descansar. Essa opção pede
+          a senha de administrador uma vez e pode ser desligada nas Preferências.
+        </p>
+        <p>Se o Mac estava desligado, a edição sai quando você abrir o app, e só é impressa se o atraso for de até 2 horas.</p>
+      </div>
+    </div>
+  </div>
+</section>

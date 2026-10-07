@@ -1,0 +1,52 @@
+---
+import Icon from "./Icon.astro";
+
+const facts = [
+  {
+    icon: "spark",
+    title: "A IA que você já usa, sem chave de API",
+    text: "Os resumos podem ser escritos pelo Claude Code, Codex, Gemini, opencode ou Ollama já instalado no seu Mac. Ou deixe sem IA: o jornal usa o resumo de cada fonte.",
+  },
+  {
+    icon: "lock",
+    title: "Seus dados ficam no seu Mac",
+    text: "Fontes, preferências e edições são salvas no seu computador. Não há conta nem servidor do Morning Paper. Com o Ollama, nem os resumos saem do Mac.",
+  },
+  {
+    icon: "print",
+    title: "Papel ou PDF",
+    text: "Imprime direto na impressora padrão, até cinco cópias, e guarda cada edição em PDF em Documentos › Morning Paper.",
+  },
+  {
+    icon: "menubar",
+    title: "Mora na barra de menus",
+    text: "Imprimir, gerar uma edição extra ou pular a de amanhã a um clique. Se preferir, o app nem aparece no Dock.",
+  },
+];
+---
+
+<section class="section" id="controle" aria-labelledby="h-controle" style="padding-top:0">
+  <div class="wrap control">
+    <div class="section-head flush">
+      <span class="eyebrow">Você no comando</span>
+      <h2 class="h2" id="h-controle">Discreto de madrugada. Fácil de ajustar de manhã.</h2>
+      <p class="body">
+        Quer mexer antes de imprimir? Revise a edição: tire uma notícia, edite um resumo, troque a manchete ou mude uma
+        matéria de seção. Se não quiser, ela sai sozinha.
+      </p>
+    </div>
+    <ul class="facts">
+      {
+        facts.map((f, i) => (
+          <li class="reveal" style={`--i:${i}`}>
+            <Icon name={f.icon} />
+            <div>
+              <b>{f.title}</b>
+              <span>{f.text}</span>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

@@ -1,0 +1,40 @@
+---
+import Newspaper from "./Newspaper.astro";
+
+const styles = [
+  { id: "classic", name: "Clássico", description: "Jornal tradicional" },
+  { id: "modern", name: "Moderno", description: "Editorial contemporâneo" },
+  { id: "financial", name: "Financeiro", description: "Denso e direto" },
+  { id: "minimal", name: "Minimalista", description: "Só tipografia" },
+] as const;
+---
+
+<section class="section" id="estilos" aria-labelledby="h-estilos">
+  <div class="wrap styles-grid">
+    <div>
+      <div class="section-head flush">
+        <span class="eyebrow">Estilos do jornal</span>
+        <h2 class="h2" id="h-estilos">Uma capa com a sua cara.</h2>
+        <p class="body">Quatro estilos, sempre em preto e branco para gastar pouca tinta. Experimente aqui: a capa ao lado muda na hora.</p>
+      </div>
+      <fieldset class="style-pick">
+        <legend class="sr-only">Escolha um estilo para ver a capa</legend>
+        {
+          styles.map((s, i) => (
+            <label class="opt">
+              <input type="radio" name="style" value={s.id} checked={i === 0} data-name={s.name} data-description={s.description.toLowerCase()} />
+              <span class="opt-txt">
+                <b>{s.name}</b>
+                <span>{s.description}</span>
+              </span>
+            </label>
+          ))
+        }
+      </fieldset>
+    </div>
+    <figure>
+      <div class="desk" aria-hidden="true"><Newspaper id="style-page" /></div>
+      <figcaption class="meta desk-cap" id="style-cap" aria-live="polite">Estilo Clássico: jornal tradicional. Notícias de exemplo.</figcaption>
+    </figure>
+  </div>
+</section>

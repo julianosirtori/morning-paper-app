@@ -1,0 +1,30 @@
+---
+import Icon from "./Icon.astro";
+import InstallSteps from "./InstallSteps.astro";
+import { DMG_URL, DOWNLOADS_URL, RELEASE_URL, VERSION } from "../config";
+---
+
+<dialog id="dl" aria-labelledby="dl-title">
+  <div class="dlg">
+    <div class="dlg-head">
+      <div>
+        <span class="eyebrow">Para macOS · versão {VERSION}</span>
+        <h2 id="dl-title">Instalar o Morning Paper</h2>
+      </div>
+      <button class="icon-btn" type="button" data-close aria-label="Fechar"><Icon name="close" /></button>
+    </div>
+    <p class="note" data-env-maybe hidden>
+      <Icon name="info" />
+      <span>Precisa de um Mac com chip Apple (M1 ou mais recente). Confira em Menu Apple › Sobre este Mac.</span>
+    </p>
+    <InstallSteps />
+    <div class="dlg-actions">
+      <a class="btn btn-primary" href={DMG_URL} id="dmg-btn">
+        <Icon name="download" />
+        Baixar o instalador
+      </a>
+    </div>
+    <p class="meta">O instalador vem do <a href={RELEASE_URL}>release v{VERSION} no GitHub</a>.</p>
+    <p class="switch-plat">Não está no Mac agora? <a class="link" href={DOWNLOADS_URL}>Ver outros downloads</a></p>
+  </div>
+</dialog>

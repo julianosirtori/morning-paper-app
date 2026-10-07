@@ -1,0 +1,10 @@
+node_modules
+dist
+.astro
+apps/desktop/src-tauri/target
+apps/desktop/src-tauri/gen/schemas
+.DS_Store
+*.log
+*.tsbuildinfo
+playwright-report
+test-results

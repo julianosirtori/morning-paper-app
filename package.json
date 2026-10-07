@@ -1,0 +1,24 @@
+{
+  "name": "morning-paper",
+  "private": true,
+  "license": "MIT",
+  "author": "Juliano Sirtori",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/julianosirtori/morning-paper-app.git"
+  },
+  "packageManager": "pnpm@10.28.1",
+  "scripts": {
+    "dev": "pnpm --filter @morning-paper/desktop dev",
+    "app": "pnpm --filter @morning-paper/desktop app",
+    "app:build": "pnpm --filter @morning-paper/desktop app:build",
+    "test": "pnpm --filter @morning-paper/desktop test",
+    "landing:dev": "pnpm --filter @morning-paper/landing dev",
+    "landing:build": "pnpm --filter @morning-paper/landing build",
+    "landing:preview": "pnpm --filter @morning-paper/landing preview",
+    "check": "pnpm --filter @morning-paper/desktop check && pnpm --filter @morning-paper/landing check",
+    "test:e2e": "pnpm --filter @morning-paper/desktop test:e2e && pnpm --filter @morning-paper/landing test:e2e",
+    "test:e2e:desktop": "pnpm --filter @morning-paper/desktop test:e2e",
+    "test:e2e:landing": "pnpm --filter @morning-paper/landing test:e2e"
+  }
+}

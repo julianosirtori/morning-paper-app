@@ -1,0 +1,93 @@
+---
+import Icon from "./Icon.astro";
+import Newspaper from "./Newspaper.astro";
+import DownloadButton from "./DownloadButton.astro";
+import g1 from "../assets/sources/g1.png";
+import bbc from "../assets/sources/bbc.png";
+import agencia from "../assets/sources/agencia.png";
+import nexo from "../assets/sources/nexo.png";
+import tecnoblog from "../assets/sources/tecnoblog.png";
+
+// Algumas das fontes sugeridas no onboarding (apps/desktop/src/data/sources.ts).
+const sources = [
+  { name: "g1", icon: g1 },
+  { name: "BBC News Brasil", icon: bbc },
+  { name: "Agência Brasil", icon: agencia },
+  { name: "Nexo Jornal", icon: nexo },
+  { name: "Tecnoblog", icon: tecnoblog },
+];
+import { MIN_MACOS, REPO_URL, VERSION } from "../config";
+---
+
+<section class="hero" aria-labelledby="h-hero">
+  <div class="wrap">
+    <div class="dateline">
+      <span data-today>Edição de hoje</span>
+      <span>Para macOS · Edição das 06:00</span>
+    </div>
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <span class="eyebrow">Seu jornal, toda manhã</span>
+        <h1 id="h-hero">Acorde com as notícias <em>já impressas</em> na mesa.</h1>
+        <p class="lede">
+          O Morning Paper lê as fontes em que você confia, junta as notícias repetidas e manda para a sua impressora
+          uma edição calma, em preto e branco, antes de você acordar.
+        </p>
+        <div class="cta-row">
+          <DownloadButton />
+          <a class="link" href="#como-funciona">Ver como funciona</a>
+        </div>
+        <p class="cta-note meta">
+          <span>Grátis e <a href={REPO_URL}>open source</a></span><span aria-hidden="true">·</span>
+          <span>macOS {MIN_MACOS} ou mais recente</span><span aria-hidden="true">·</span>
+          <span>Apple Silicon</span>
+          <span class="env-note" data-env-note hidden></span>
+        </p>
+      </div>
+
+      <figure class="reveal">
+        <figcaption class="sr-only">Janela do Morning Paper na tela Hoje, mostrando a capa da edição no estilo Clássico.</figcaption>
+        <div class="win" aria-hidden="true">
+          <div class="win-side">
+            <div class="lights"><i></i><i></i><i></i></div>
+            <div class="win-brand"><b>Morning<br />Paper</b><span>Seu jornal, toda manhã</span></div>
+            <span class="win-group">Ler e imprimir</span>
+            <span class="win-item on"><Icon name="sun" />Hoje</span>
+            <span class="win-item"><Icon name="paper" />Edição</span>
+            <span class="win-item"><Icon name="edit" />Revisar<em>18</em></span>
+            <span class="win-item"><Icon name="print" />Imprimir</span>
+            <span class="win-group">Configurar</span>
+            <span class="win-item"><Icon name="rss" />Fontes<em>5</em></span>
+            <span class="win-item"><Icon name="gear" />Preferências</span>
+            <p class="win-foot"><b>Open source · v{VERSION}</b>Seus dados ficam no seu Mac.</p>
+          </div>
+          <div class="win-main">
+            <div class="win-bar">
+              <div class="win-title"><b>Hoje</b><span>Edição #142 · pronta · 18 notícias</span></div>
+              <span class="win-btn">Revisar notícias</span>
+              <span class="win-btn solid">Imprimir jornal</span>
+            </div>
+            <div class="win-desk"><Newspaper /></div>
+          </div>
+        </div>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="sources" aria-label="Fontes de notícia">
+  <div class="wrap">
+    <p>Leia de quem você confia:</p>
+    <ul>
+      {
+        sources.map((s) => (
+          <li>
+            <img class="src-icon" src={s.icon.src} alt="" width="20" height="20" loading="lazy" decoding="async" />
+            {s.name}
+          </li>
+        ))
+      }
+      <li class="more">e qualquer site com RSS ou Atom</li>
+    </ul>
+  </div>
+</section>
