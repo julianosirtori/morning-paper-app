@@ -8,6 +8,10 @@ on:
       - "apps/desktop/package.json"
       - "pnpm-lock.yaml"
       - ".github/workflows/landing.yml"
+  # Republica quando um release termina, para a versão mostrada na página bater com o .dmg mais recente.
+  workflow_run:
+    workflows: [Release]
+    types: [completed]
   workflow_dispatch:
 
 permissions:

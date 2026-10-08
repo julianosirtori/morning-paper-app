@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
-import app from "@morning-paper/desktop/package.json" with { type: "json" };
 
-const DMG = new RegExp(`github\\.com/.+/releases/download/v${app.version.replace(/\./g, "\\.")}/Morning\\.Paper_${app.version.replace(/\./g, "\\.")}_aarch64\\.dmg$`);
+// Sempre o release mais recente, pelo nome fixo que o release.yml publica.
+const DMG = /github\.com\/.+\/releases\/latest\/download\/Morning\.Paper_aarch64\.dmg$/;
 
 test.describe("botão de download conforme o computador", () => {
   test("Mac com chip Apple: abre o diálogo com o instalador do release", async ({ page }) => {

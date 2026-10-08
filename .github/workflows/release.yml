@@ -1,9 +1,10 @@
 name: Release
 
-# Publica o instalador no release do GitHub. É daqui que o botão de download da landing baixa:
-#   releases/download/v<versão>/Morning.Paper_<versão>_aarch64.dmg
-# Para lançar: suba a versão em apps/desktop/package.json e src-tauri/tauri.conf.json, depois
-#   git tag v0.8.4 && git push origin v0.8.4
+# Publica o instalador no release do GitHub. É daqui que o botão de download da landing baixa,
+# sempre do release mais recente, pela cópia com nome fixo:
+#   releases/latest/download/Morning.Paper_aarch64.dmg
+# Para lançar: pnpm release patch|minor|major (veja scripts/release.mjs). Ele sobe a versão,
+# fecha o CHANGELOG, cria a tag e envia, o que dispara este workflow.
 
 on:
   push:
@@ -48,3 +49,10 @@ jobs:
           releaseBody: Instalador para Macs com chip Apple (macOS 11 ou mais recente). Veja como instalar em https://morning-paper-app.julianosirtori.dev/downloads/
           releaseDraft: false
           prerelease: false
+      - name: Publica uma cópia do .dmg com nome fixo
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          dmg=$(find apps/desktop/src-tauri/target/release/bundle/dmg -name '*.dmg' | head -n 1)
+          cp "$dmg" Morning.Paper_aarch64.dmg
+          gh release upload "$GITHUB_REF_NAME" Morning.Paper_aarch64.dmg --clobber

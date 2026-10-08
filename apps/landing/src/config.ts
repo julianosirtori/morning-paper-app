@@ -3,16 +3,16 @@
 import app from "@morning-paper/desktop/package.json";
 
 export const VERSION = app.version;
-/** Troque aqui quando o repositório for publicado: vale para o link do GitHub e para os downloads. */
+/** Repositório no GitHub: vale para o link do código e para os downloads. */
 export const REPO = "julianosirtori/morning-paper-app";
 export const REPO_URL = `https://github.com/${REPO}`;
 export const RELEASES_URL = `${REPO_URL}/releases`;
-/** Página do release desta versão no GitHub, com todos os artefatos. */
-export const RELEASE_URL = `${RELEASES_URL}/tag/v${VERSION}`;
-/** O Tauri gera "Morning Paper_<versão>_aarch64.dmg"; o GitHub troca o espaço por ponto. */
-export const DMG_NAME = `Morning.Paper_${VERSION}_aarch64.dmg`;
-/** Artefato do release (o mesmo que o workflow release.yml publica). */
-export const DMG_URL = `${RELEASES_URL}/download/v${VERSION}/${DMG_NAME}`;
+/** Página do release mais recente no GitHub, com todos os artefatos. */
+export const RELEASE_URL = `${RELEASES_URL}/latest`;
+/** Cópia do .dmg com nome fixo que o release.yml publica em cada release, além do arquivo com a versão no nome. */
+export const DMG_NAME = "Morning.Paper_aarch64.dmg";
+/** O GitHub resolve "latest" para o release mais recente, então o link não depende da versão desta build. */
+export const DMG_URL = `${RELEASES_URL}/latest/download/${DMG_NAME}`;
 export const MIN_MACOS = 11;
 
 /** Base do site (no GitHub Pages, "/<repositório>/"), sempre com a barra final. */
