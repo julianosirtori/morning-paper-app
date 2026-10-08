@@ -5,10 +5,10 @@ import type { EditionStory, SectionKey } from "../data/types";
 import { clip } from "./text";
 
 const LANGUAGE_NAMES: Record<string, string> = { "pt-BR": "Brazilian Portuguese", en: "English", es: "Spanish" };
-/** Só as primeiras histórias ganham texto longo (são as que viram matéria principal). */
-const LONG_FORM = 8;
 /** As primeiras abrem página: texto mais longo, para preencher as colunas da principal. */
 const OPENERS = 4;
+/** As seguintes viram matérias com texto corrido; as demais, notas e "Leia também". */
+const LONG_FORM = 14;
 const MAX_STORIES = 45;
 
 export function buildPrompt(stories: EditionStory[], lang: string): string {
@@ -18,7 +18,7 @@ export function buildPrompt(stories: EditionStory[], lang: string): string {
     title: s.title,
     sources: s.sources,
     section: s.section,
-    text: clip(s.body.join(" ") || s.summary, i < OPENERS ? 2500 : i < LONG_FORM ? 1500 : 900),
+    text: clip(s.body.join(" ") || s.summary, i < OPENERS ? 4000 : i < LONG_FORM ? 2500 : 1500),
   }));
   return [
     "You are the editor of a calm, printed morning newspaper. Below are yesterday's news items as JSON.",
@@ -27,7 +27,8 @@ export function buildPrompt(stories: EditionStory[], lang: string): string {
     '{"headline":"<id of the most important story>","stories":[{"id":"<same id>","title":"<clear headline, max 90 chars>","summary":"<1-2 sentences, max 240 chars>","body":["<paragraph>", "..."],"section":"<one of: ' +
       SECTIONS.join("|") +
       '>"}]}',
-    `Include every id once. "body" has 4-5 paragraphs (about 250 words in total) for the first ${OPENERS} stories, 2-3 short paragraphs (about 120 words) for stories ${OPENERS + 1} to ${LONG_FORM}, and 1-2 short paragraphs (about 70 words, 3-4 sentences) for all the others.`,
+    `Include every id once. "body" has 5-6 paragraphs (about 350 words in total) for the first ${OPENERS} stories, 3-4 paragraphs (about 200 words) for stories ${OPENERS + 1} to ${LONG_FORM}, and 2-3 paragraphs (about 120 words) for all the others.`,
+    "The reader wants to understand each story, not just hear about it: say what happened, who is involved, why it matters and what comes next, as far as the given text allows.",
     "Every paragraph must be made of complete sentences that read well on their own: the page may print only the first paragraph, or only the summary. Skip photo captions, credits and repeated headlines found in the text.",
     "If the given text is too short for that length, write less: never pad with invented facts.",
     "",

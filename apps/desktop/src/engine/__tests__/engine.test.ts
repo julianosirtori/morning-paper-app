@@ -112,6 +112,20 @@ describe("compose", () => {
     const withPhoto = (pg: (typeof pages)[number]) => [...pg.side, ...pg.more].filter((x) => x.img).length;
     expect(pages.every((pg) => withPhoto(pg) > 0 || pg.layout === "split")).toBe(true);
   });
+  it("notícias só com título (Google News da cidade) não viram principal nem 'Leia também'", () => {
+    const sources = [src("a", "brazil", "high"), src("c", "tech"), src("w", "world"), src("l", "local", "high")];
+    const items = Array.from({ length: 40 }, (_, i) => item(["a", "c", "w", "l"][i % 4], unique(i), 1 + (i % 10)));
+    const stories = selectStories(buildStories(items, sources, now), DEFAULT_TOPICS, 4).map((s) =>
+      s.section === "local" ? { ...s, summary: "", body: [] } : s,
+    );
+    const pages = composeEdition(base(stories), t);
+    expect(pages.length).toBeGreaterThan(1);
+    for (const p of pages) {
+      expect(p.lead.length).toBeGreaterThan(0);
+      expect((p.fill ?? []).every((f) => f.p?.length)).toBe(true);
+      if (p.second) expect(p.second.lead.length).toBeGreaterThan(0);
+    }
+  });
   it("edição vazia não tem páginas", () => {
     expect(composeEdition(base([]), t)).toEqual([]);
   });

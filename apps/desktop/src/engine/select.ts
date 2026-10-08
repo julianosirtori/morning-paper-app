@@ -9,8 +9,11 @@ const MAX_AGE_HOURS = 36;
 /** Publicidade disfarçada de notícia ("Especial publicitário", "Sponsored"…) não entra. */
 const SPONSORED = /^(especial publicit[aá]rio|publieditorial|conte[uú]do patrocinado|informe publicit[aá]rio|sponsored|paid content|advertorial)\b/i;
 
-/** Quantas histórias cabem: capa (~19 contando as curtas) + páginas internas (12 cada, ver compose.ts). */
-export const storyBudget = (pages: number) => 19 + Math.max(0, pages - 1) * 12;
+/**
+ * Quantas histórias entram: capa (12 contando as curtas; 16 quando ela é a única página, porque também
+ * leva as chamadas) + páginas internas (7 cada, ver compose.ts). Poucas, para cada uma ter espaço de verdade.
+ */
+export const storyBudget = (pages: number) => (pages > 1 ? 12 + (pages - 1) * 7 : 16);
 
 function hoursAgo(iso: string | undefined, now: Date): number | undefined {
   if (!iso) return undefined;

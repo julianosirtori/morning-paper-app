@@ -4,14 +4,15 @@ import type { EditionDoc, EditionStory, Img, ImgKind, Lead, LayoutId, PageData, 
 import { clip, fold, sentences, stripPhotoCredit } from "./text";
 
 /**
- * Histórias por página interna. Cada área da página tem altura fixa e recebe mais texto do que cabe:
+ * Histórias por página interna: poucas, para cada matéria ter texto de verdade (e não só o resumo).
+ * Cada área da página tem altura fixa e recebe mais texto do que cabe:
  * o NewspaperPage (hooks/useFitPage) esconde o que sobra e corta a última matéria no fim de uma frase.
  */
-export const PER_INNER_PAGE = 12;
+export const PER_INNER_PAGE = 7;
 /** Modelos das páginas internas, em rodízio: a ordem começa em um ponto diferente a cada edição. */
 const INNER_LAYOUTS: LayoutId[] = ["classic", "banner", "rail", "split"];
 /** Histórias que cada modelo precisa para não sobrar espaço vazio. */
-const MIN_STORIES: Partial<Record<LayoutId, number>> = { banner: 4, rail: 7, split: 10 };
+const MIN_STORIES: Partial<Record<LayoutId, number>> = { banner: 4, rail: 6, split: 6 };
 
 /** Modelo da página `i`: segue o rodízio, pulando os que pedem mais histórias do que a página tem. */
 function pickLayout(i: number, n: number, count: number): LayoutId {
@@ -62,6 +63,20 @@ function wholeSentences(s: EditionStory, max: number): string[] {
   return out;
 }
 
+/** Tem texto além do título? Feeds como o Google News (notícias da cidade) trazem só a manchete. */
+const hasText = (s: EditionStory) => wholeSentences(s, 200).some((p) => p.trim());
+
+/**
+ * Tira `n` histórias da fila (em ordem), preferindo as com texto (`withText`) ou as só com título.
+ * Faltando das preferidas, completa com as outras.
+ */
+function take(queue: EditionStory[], n: number, withText: boolean): EditionStory[] {
+  const picked = queue.filter((s) => hasText(s) === withText).slice(0, n);
+  for (const s of queue) if (picked.length < n && !picked.includes(s)) picked.push(s);
+  for (const s of picked) queue.splice(queue.indexOf(s), 1);
+  return picked;
+}
+
 /** Matéria curta: título, texto em frases inteiras e o resumo como reserva para quando faltar espaço. */
 const short = (s: EditionStory, max: number): Story => ({ h: s.title, p: wholeSentences(s, max), short: s.summary });
 
@@ -81,7 +96,8 @@ function planInnerPages(rest: EditionStory[], innerPages: number): { pages: Inne
     const room = page ? PER_INNER_PAGE - page.stories.length : 0;
     // Junta seções pequenas na mesma página ("Mundo e Negócios"); seções grandes abrem página nova.
     if (!page || room < Math.min(3, stories.length) || page.sections.length >= 2) {
-      if (pages.length >= innerPages) continue;
+      // Seção só com títulos (sem texto para a principal) não abre página: vai para a capa.
+      if (pages.length >= innerPages || !stories.some(hasText)) continue;
       page = { sections: [], stories: [] };
       pages.push(page);
     }
@@ -91,8 +107,8 @@ function planInnerPages(rest: EditionStory[], innerPages: number): { pages: Inne
       placed.add(s.id);
     }
   }
-  // Página com menos de 3 histórias fica pobre: devolve para a capa.
-  const kept = pages.filter((p) => p.stories.length >= 3);
+  // Página com menos de 3 histórias fica pobre: devolve para a capa. Sem nenhum texto, também.
+  const kept = pages.filter((p) => p.stories.length >= 3 && p.stories.some(hasText));
   const keptIds = new Set(kept.flatMap((p) => p.stories.map((s) => s.id)));
   return { pages: kept, leftover: rest.filter((s) => !keptIds.has(s.id)) };
 }
@@ -101,11 +117,15 @@ function planInnerPages(rest: EditionStory[], innerPages: number): { pages: Inne
 export function composeEdition(doc: EditionDoc, t: TFunction): PageData[] {
   const included = doc.stories.filter((s) => s.inc).sort((a, b) => b.score - a.score);
   if (!included.length) return [];
-  const head = included.find((s) => s.head) ?? included[0];
+  // A manchete precisa de texto para encher as colunas: se a escolhida só tem título, vai a próxima com texto.
+  const chosen = included.find((s) => s.head) ?? included[0];
+  const head = hasText(chosen) ? chosen : (included.find(hasText) ?? chosen);
   const rest = included.filter((s) => s.id !== head.id);
   const sectionName = (k: SectionKey) => t(`sections.${k}`);
 
   const { pages: inner, leftover } = planInnerPages(rest, Math.max(0, doc.pageCount - 1));
+  // A principal de cada página interna é a primeira com texto (as só com título ficam para as chamadas).
+  for (const p of inner) p.stories.unshift(...take(p.stories, 1, true));
   const innerNames = inner.map((p) => p.sections.map(sectionName).join(t("compose.and")));
 
   const photo = (s: EditionStory, withIllustration = false): Img | undefined =>
@@ -129,7 +149,7 @@ export function composeEdition(doc: EditionDoc, t: TFunction): PageData[] {
     img: photo(s, true),
   });
   /** "Leia também": continua a coluna da principal quando o texto dela acaba antes do fim da área. */
-  const fill = (stories: EditionStory[]): Story[] => stories.map((s) => ({ ...short(s, 900), kicker: t("compose.alsoRead") }));
+  const fill = (stories: EditionStory[]): Story[] => stories.map((s) => ({ ...short(s, 1500), kicker: t("compose.alsoRead") }));
 
   // Capa: manchete, chamadas para as páginas internas, mais notícias e curtas.
   const teasers: Story[] = inner.slice(0, 4).map((p, i) => ({
@@ -138,15 +158,15 @@ export function composeEdition(doc: EditionDoc, t: TFunction): PageData[] {
     img: i === 0 ? photo(p.stories[0]) : undefined,
   }));
   const pool = [...leftover];
-  while (teasers.length < 4 && pool.length) teasers.push(story(pool.shift()!, 260, teasers.length === 0));
+  while (teasers.length < 4 && pool.length) teasers.push(story(pool.shift()!, 600, teasers.length === 0));
   // Sem páginas internas, a própria capa usa as notícias que iriam para dentro.
   if (!inner.length) pool.push(...rest.filter((s) => !pool.includes(s) && !teasers.some((x) => x.h === s.title)));
-  const frontFill = fill(pool.splice(0, 2));
+  const frontFill = fill(take(pool, 2, true));
   const more: Story[] = [];
   if (inner.length) more.push({ h: t("compose.inThisEdition"), list: innerNames.map((n, i) => t("compose.pageRef", { section: n, page: i + 2 })) });
-  more.push(...pool.splice(0, 8).map((s, i) => story(s, 480, i % 3 === 0)));
+  more.push(...take(pool, 4, true).map((s, i) => story(s, 1200, i % 2 === 0)));
   const toBriefs = (list: EditionStory[]) => (list.length ? list.map((s) => ({ h: sectionName(s.section), p: clip(s.title, 110) })) : undefined);
-  const briefs = toBriefs(pool.splice(0, 12));
+  const briefs = toBriefs(pool.splice(0, 5));
 
   const front: PageData = {
     section: t("compose.frontSection"),
@@ -167,17 +187,17 @@ export function composeEdition(doc: EditionDoc, t: TFunction): PageData[] {
     switch (layout) {
       case "banner":
         // Foto grande; embaixo, uma faixa de matérias com foto, uma por coluna.
-        return { ...base, fill: fill(queue.splice(0, 1)), side: [], more: queue.splice(0, 8).map((s, k) => story(s, 700, k < 4, true)), briefs: toBriefs(queue) };
+        return { ...base, fill: fill(take(queue, 1, true)), side: [], more: queue.splice(0, 8).map((s, k) => story(s, 1200, k < 4, true)), briefs: toBriefs(queue) };
       case "split": {
-        // Duas principais lado a lado; embaixo, matérias corridas e uma coluna de curtas.
-        const second = lead(queue.shift()!, 2000);
-        return { ...base, fill: fill(queue.splice(0, 1)), second: { ...second, fill: fill(queue.splice(0, 1)) }, side: queue.splice(0, 5).map((s) => short(s, 200)), more: queue.map((s, k) => story(s, 520, k % 2 === 0)) };
+        // Duas principais lado a lado; embaixo, matérias corridas na largura toda.
+        const second = lead(take(queue, 1, true)[0], 2000);
+        return { ...base, fill: fill(take(queue, 1, true)), second: { ...second, fill: fill(take(queue, 1, true)) }, side: [], more: queue.map((s, k) => story(s, 1500, k % 2 === 0)) };
       }
       case "rail":
         // Coluna estreita à esquerda com chamadas e fotos pequenas; principal larga à direita.
-        return { ...base, fill: fill(queue.splice(0, 2)), side: queue.splice(0, 4).map((s, k) => story(s, 360, k < 2)), more: queue.map((s, k) => story(s, 600, k % 3 === 0)) };
+        return { ...base, fill: fill(take(queue, 1, true)), side: take(queue, 3, false).map((s, k) => story(s, 700, k < 2)), more: queue.map((s, k) => story(s, 1500, k % 2 === 0)) };
       default:
-        return { ...base, fill: fill(queue.splice(0, 2)), side: queue.splice(0, 4).map((s, k) => story(s, 420, k === 0)), more: queue.map((s, k) => story(s, 600, k % 3 === 1)) };
+        return { ...base, fill: fill(take(queue, 1, true)), side: take(queue, 2, false).map((s, k) => story(s, 900, k === 0)), more: queue.map((s, k) => story(s, 1500, k % 2 === 1)) };
     }
   });
 

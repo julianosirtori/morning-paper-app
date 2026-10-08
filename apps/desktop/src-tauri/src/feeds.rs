@@ -193,13 +193,17 @@ fn to_item(e: feed_rs::model::Entry) -> FeedItem {
         .find(|l| l.rel.as_deref().unwrap_or("alternate") == "alternate")
         .or_else(|| e.links.first())
         .map(|l| l.href.clone());
-    let summary = e
-        .summary
-        .as_ref()
-        .map(|t| t.content.clone())
-        .filter(|s| !s.trim().is_empty())
-        .or_else(|| e.content.as_ref().and_then(|c| c.body.clone()))
-        .unwrap_or_default();
+    // Muitos feeds (WordPress) trazem um resumo curto em <description> e a matéria inteira em
+    // <content:encoded>: fica com o mais longo, para a edição não sair com o resumo do resumo.
+    let summary = [
+        e.summary.as_ref().map(|t| t.content.clone()),
+        e.content.as_ref().and_then(|c| c.body.clone()),
+    ]
+    .into_iter()
+    .flatten()
+    .filter(|s| !s.trim().is_empty())
+    .max_by_key(|s| s.len())
+    .unwrap_or_default();
     let image = e.media.iter().find_map(|m| {
         m.content
             .iter()
@@ -250,6 +254,17 @@ mod tests {
         assert_eq!(item.image.as_deref(), Some("https://ex.com/a.jpg"));
         assert!(item.summary.contains("Resumo"));
         assert!(item.published.unwrap().starts_with("2026-10-07T05:00:00"));
+    }
+
+    #[test]
+    fn prefers_full_content_over_short_description() {
+        let xml = r#"<?xml version="1.0"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>Teste</title>
+          <item><title>Manchete</title><link>https://ex.com/a</link><description>Resumo curto.</description>
+          <content:encoded><![CDATA[<p>Primeiro parágrafo da matéria completa.</p><p>Segundo parágrafo.</p>]]></content:encoded></item>
+          </channel></rss>"#;
+        let feed = feed_rs::parser::parse(xml.as_bytes()).unwrap();
+        let item = to_item(feed.entries.into_iter().next().unwrap());
+        assert!(item.summary.contains("Segundo parágrafo"));
     }
 
     /// Acessa a rede: `cargo test -- --ignored network`
