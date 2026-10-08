@@ -51,7 +51,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        app: [desktop, landing]
+        # Só os navegadores que cada playwright.config.ts usa: menos pacotes do apt para baixar.
+        include:
+          - app: desktop
+            browsers: webkit
+          - app: landing
+            browsers: chromium webkit
     steps:
       - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4
@@ -60,7 +65,10 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @morning-paper/${{ matrix.app }} exec playwright install --with-deps chromium webkit
+      # Sem isso, o apt espera para sempre quando o espelho do Ubuntu para no meio de um download.
+      - name: Tempo limite e novas tentativas no apt
+        run: printf 'Acquire::Retries "5";\nAcquire::http::Timeout "30";\nAcquire::https::Timeout "30";\n' | sudo tee /etc/apt/apt.conf.d/99-ci-network
+      - run: pnpm --filter @morning-paper/${{ matrix.app }} exec playwright install --with-deps ${{ matrix.browsers }}
         timeout-minutes: 10
       - run: pnpm test:e2e:${{ matrix.app }}
       - uses: actions/upload-artifact@v4
