@@ -7,6 +7,7 @@
 //! - Impressoras reais via CUPS (`lpstat`) e diálogo de impressão nativo.
 //! - Detecção dos assistentes de IA de linha de comando no PATH do usuário.
 
+mod activity;
 mod ai;
 mod feeds;
 mod pdf;
@@ -85,6 +86,7 @@ fn show_main(app: &AppHandle) {
         let _ = w.unminimize();
         let _ = w.set_focus();
     }
+    activity::log(app, "[janela] aberta");
 }
 
 /* ---------- Comandos chamados pelo React ---------- */
@@ -148,16 +150,56 @@ fn set_background(
 
 /// Exporta a página atual para PDF (sem diálogo) — usado pela entrega automática.
 #[tauri::command]
-async fn export_pdf(window: tauri::WebviewWindow, path: String) -> Result<(), String> {
-    pdf::export_pdf(window, path).await
+async fn export_pdf(
+    app: AppHandle,
+    window: tauri::WebviewWindow,
+    path: String,
+) -> Result<(), String> {
+    activity::log(&app, format!("[pdf] exportando {}", path));
+    let start = std::time::Instant::now();
+    match pdf::export_pdf(window, path).await {
+        Ok(()) => {
+            let secs = start.elapsed().as_secs_f64();
+            activity::log(&app, format!("[pdf] pronto em {:.1}s", secs));
+            Ok(())
+        }
+        Err(e) => {
+            activity::log(&app, format!("[pdf] falhou: {}", e));
+            Err(e)
+        }
+    }
 }
 
 /// Imprime um PDF já gerado na impressora indicada, sem diálogo.
 #[tauri::command]
-async fn print_pdf(path: String, printer: String, copies: u32) -> Result<(), String> {
-    tauri::async_runtime::spawn_blocking(move || pdf::print_file(&path, &printer, copies))
+async fn print_pdf(
+    app: AppHandle,
+    path: String,
+    printer: String,
+    copies: u32,
+) -> Result<(), String> {
+    let copies_text = if copies == 1 { "cópia" } else { "cópias" };
+    activity::log(
+        &app,
+        format!("[impressão] enviando para {} ({} {})", printer, copies, copies_text),
+    );
+    match tauri::async_runtime::spawn_blocking(move || pdf::print_file(&path, &printer, copies))
         .await
-        .map_err(|e| e.to_string())?
+    {
+        Ok(Ok(())) => {
+            activity::log(&app, "[impressão] enviado");
+            Ok(())
+        }
+        Ok(Err(e)) => {
+            activity::log(&app, format!("[impressão] falhou: {}", e));
+            Err(e)
+        }
+        Err(e) => {
+            let err_msg = e.to_string();
+            activity::log(&app, format!("[impressão] falhou: {}", err_msg));
+            Err(err_msg)
+        }
+    }
 }
 
 #[tauri::command]
@@ -166,8 +208,27 @@ async fn fetch_feeds(feeds: Vec<feeds::FeedRequest>) -> Vec<feeds::FeedResult> {
 }
 
 #[tauri::command]
-async fn run_agent(agent: String, path: String, prompt: String) -> Result<String, String> {
-    ai::run(&agent, &path, &prompt).await
+async fn run_agent(
+    app: AppHandle,
+    agent: String,
+    path: String,
+    prompt: String,
+) -> Result<String, String> {
+    let n_chars = prompt.len();
+    activity::log(&app, format!("[ia] {} iniciou ({} caracteres)", agent, n_chars));
+    let start = std::time::Instant::now();
+    match ai::run(&agent, &path, &prompt).await {
+        Ok(result) => {
+            let secs = start.elapsed().as_secs_f64();
+            activity::log(&app, format!("[ia] {} terminou em {:.1}s", agent, secs));
+            Ok(result)
+        }
+        Err(e) => {
+            let secs = start.elapsed().as_secs_f64();
+            activity::log(&app, format!("[ia] {} falhou em {:.1}s: {}", agent, secs, e));
+            Err(e)
+        }
+    }
 }
 
 #[tauri::command]
@@ -200,6 +261,11 @@ async fn set_wake(enabled: bool, time: String) -> Result<(), String> {
 #[tauri::command]
 fn show_main_window(app: AppHandle) {
     show_main(&app);
+}
+
+#[tauri::command]
+fn log_event(app: AppHandle, message: String) {
+    activity::log(&app, format!("[app] {}", message));
 }
 
 #[tauri::command]
@@ -354,7 +420,8 @@ pub fn run() {
             pdf_path,
             set_schedule,
             set_wake,
-            show_main_window
+            show_main_window,
+            log_event
         ])
         .setup(|app| {
             build_tray(app.handle())?;

@@ -2,7 +2,7 @@
 import type { EditionDoc } from "../data/types";
 import { PDF_PRINTER } from "../data/system";
 import { t } from "../i18n";
-import { exportPdf, isTauri, notify, pdfPath, printEdition, printPdf, revealInFinder, showMainWindow } from "../lib/native";
+import { exportPdf, isTauri, logEvent, notify, pdfPath, printEdition, printPdf, revealInFinder, showMainWindow } from "../lib/native";
 import { useEditions } from "../store/editions";
 import { useNavigation } from "../store/navigation";
 import { usePreferences } from "../store/preferences";
@@ -53,24 +53,36 @@ export async function deliver(doc: EditionDoc, lateMinutes: number) {
   const shouldPrint = prefs.delivery.print && lateMinutes <= MAX_LATE_TO_PRINT;
   let path: string | undefined;
 
+  logEvent(`entrega da edição ${doc.n}: atraso ${lateMinutes} min, imprimir: ${shouldPrint ? "sim" : "não"}`);
+
   try {
     if (prefs.delivery.pdf || shouldPrint) {
+      const startedAt = new Date().toISOString();
       path = await savePdfOf(doc);
-      log.push({ step: "pdf", at: new Date().toISOString(), detail: path });
+      logEvent(`PDF salvo: ${path}`);
+      log.push({ step: "pdf", at: new Date().toISOString(), startedAt, detail: path });
     }
     if (shouldPrint && path) {
       if (prefs.askPrinter) {
+        logEvent("abrindo diálogo de impressão");
         await showMainWindow();
         useNavigation.getState().go("imprimir");
         await printEdition(printer.id === PDF_PRINTER.id ? undefined : printer);
       } else if (printer.id !== PDF_PRINTER.id && printer.status !== "offline") {
+        const startedAt = new Date().toISOString();
         await printPdf(path, printer.id, usePrint.getState().copies);
-        log.push({ step: "sent", at: new Date().toISOString(), detail: printer.name });
+        logEvent(`enviado para ${printer.name}`);
+        log.push({ step: "sent", at: new Date().toISOString(), startedAt, detail: printer.name });
+      } else {
+        logEvent(`não imprime: impressora ${printer.name} ${printer.status === "offline" ? "offline" : "é PDF"}`);
       }
+    } else if (prefs.delivery.print && lateMinutes > MAX_LATE_TO_PRINT) {
+      logEvent(`não imprime: ${lateMinutes} min de atraso (limite ${MAX_LATE_TO_PRINT})`);
     }
     await notify(t("delivery.title", { n: doc.n }), log.some((l) => l.step === "sent") ? t("delivery.printed", { printer: printer.name }) : t("delivery.ready"));
   } catch (e) {
     console.error(e);
+    logEvent(`entrega falhou: ${String(e)}`);
     await notify(t("delivery.title", { n: doc.n }), t("delivery.failed", { error: String(e) }));
   } finally {
     await useEditions.getState().save({ ...doc, log });

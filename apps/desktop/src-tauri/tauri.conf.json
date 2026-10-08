@@ -26,7 +26,8 @@
           "x": 20,
           "y": 28
         },
-        "backgroundColor": "#f7f6f3"
+        "backgroundColor": "#f7f6f3",
+        "backgroundThrottling": "disabled"
       }
     ],
     "security": {

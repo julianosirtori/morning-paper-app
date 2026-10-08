@@ -93,6 +93,7 @@ pub fn start(app: AppHandle) {
                 }
             };
             if let Some(late_minutes) = fire {
+                crate::activity::log(&app, format!("[agenda] disparou (atraso {} min)", late_minutes));
                 let _ = app.emit("scheduled-edition", ScheduledRun { late_minutes });
             }
         }

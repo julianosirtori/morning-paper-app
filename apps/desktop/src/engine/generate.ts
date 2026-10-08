@@ -63,29 +63,32 @@ export async function generateEdition(input: GenerateInput): Promise<GenerateOut
   const active = input.sources.filter((s) => !s.paused);
   if (!active.length) throw new GenerateError("noSources");
   const log: EditionDoc["log"] = [];
-  const mark = (step: EditionStep, detail?: string) => log.push({ step, at: new Date().toISOString(), detail });
+  const mark = (step: EditionStep, startedAt?: string, detail?: string) => log.push({ step, at: new Date().toISOString(), startedAt, detail });
 
   onProgress({ step: "collecting", done: 0, total: active.length });
+  const startCollected = new Date().toISOString();
   const feeds = await fetchFeeds(active.map((s) => ({ id: s.id, url: s.url })));
   const items = feeds.filter((f) => f.ok).flatMap(toFeedItems);
-  mark("collected", String(feeds.filter((f) => f.ok).length));
+  mark("collected", startCollected, String(feeds.filter((f) => f.ok).length));
 
   onProgress({ step: "grouping" });
+  const startGrouped = new Date().toISOString();
   const built = buildStories(items, active);
   const all = dropSeen(built, input.seen ?? []);
   let stories = selectStories(all, input.topics, input.pageCount);
   if (!stories.length) throw new GenerateError("noNews");
-  mark("grouped", String(items.length - built.length));
+  mark("grouped", startGrouped, String(items.length - built.length));
 
   let assistant: string | null = null;
   let aiError: string | undefined;
   if (input.agent?.cmd && input.agent.path) {
     onProgress({ step: "summarizing", assistant: input.agent.name });
+    const startSummarized = new Date().toISOString();
     try {
       const raw = await runAgent(input.agent.id, input.agent.path, buildPrompt(stories, input.lang));
       stories = applyResponse(stories, parseResponse(raw));
       assistant = input.agent.name;
-      mark("summarized", assistant);
+      mark("summarized", startSummarized, assistant);
     } catch (e) {
       aiError = e instanceof Error ? e.message : String(e);
       console.warn("IA falhou; seguindo com o texto dos feeds:", aiError);
@@ -93,7 +96,8 @@ export async function generateEdition(input: GenerateInput): Promise<GenerateOut
   }
 
   onProgress({ step: "building" });
-  mark("built");
+  const startBuilt = new Date().toISOString();
+  mark("built", startBuilt);
   const doc: EditionDoc = {
     version: 1,
     n: input.n,

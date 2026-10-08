@@ -207,3 +207,9 @@ export async function notify(title: string, body: string) {
     console.warn("notificação indisponível", e);
   }
 }
+
+/** Grava uma linha no log de atividade (~/Library/Logs/...). */
+export function logEvent(message: string): void {
+  if (!isTauri()) return;
+  invoke("log_event", { message }).catch(() => {});
+}

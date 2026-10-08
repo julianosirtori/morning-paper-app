@@ -38,3 +38,8 @@ export function nextEditionDate(time: string, repeat: Repeat = DAILY, now = new 
   }
   return ymd(d);
 }
+
+/** Atraso real no fim da geração (se o app ficou parado, a edição não imprime sozinha horas depois). */
+export function lateAt(lateMinutes: number, firedAt: number, now = Date.now()): number {
+  return lateMinutes + Math.max(0, Math.floor((now - firedAt) / 60000));
+}

@@ -98,7 +98,7 @@ export type EditionDoc = {
   /** Nome do assistente que resumiu, ou null (sem IA / falhou). */
   assistant: string | null;
   aiError?: string;
-  log: { step: EditionStep; at: string; detail?: string }[];
+  log: { step: EditionStep; at: string; startedAt?: string; detail?: string }[];
 };
 
 /** Conteúdo de exemplo (usado na apresentação do onboarding). */

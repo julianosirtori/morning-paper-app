@@ -146,4 +146,31 @@ describe("generateEdition", () => {
     await generateEdition(input({ agent: { ...agent, path: null } }));
     expect(runAgent).not.toHaveBeenCalled();
   });
+
+  it("cada entrada do log tem startedAt e at como ISO strings com startedAt <= at", async () => {
+    vi.mocked(fetchFeeds).mockResolvedValue([feed("a", items())]);
+    const { doc } = await generateEdition(input());
+    doc.log.forEach((entry) => {
+      expect(typeof entry.at).toBe("string");
+      expect(entry.at).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
+      expect(entry.startedAt).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
+      expect(Date.parse(entry.startedAt!)).toBeLessThanOrEqual(Date.parse(entry.at));
+    });
+  });
+
+  it("log entries com IA têm startedAt e at como ISO strings", async () => {
+    vi.mocked(fetchFeeds).mockResolvedValue([feed("a", items())]);
+    vi.mocked(runAgent).mockImplementation(async (_id, _path, prompt) => {
+      const [{ id }] = JSON.parse(prompt.split("\n").at(-1)!) as { id: string }[];
+      return `Aqui está: {"headline": "${id}", "stories": [{"id": "${id}", "title": "Título da IA"}]}`;
+    });
+    const { doc } = await generateEdition(input({ agent }));
+    expect(doc.log.map((l) => l.step)).toContain("summarized");
+    doc.log.forEach((entry) => {
+      expect(typeof entry.at).toBe("string");
+      expect(entry.at).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
+      expect(entry.startedAt).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
+      expect(Date.parse(entry.startedAt!)).toBeLessThanOrEqual(Date.parse(entry.at));
+    });
+  });
 });
