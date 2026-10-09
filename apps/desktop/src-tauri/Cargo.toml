@@ -1,6 +1,6 @@
 [package]
 name = "morning-paper"
-version = "0.8.4"
+version = "0.8.5"
 description = "Seu jornal, toda manhã — impresso em preto e branco."
 authors = ["Juliano Sirtori"]
 license = "MIT"

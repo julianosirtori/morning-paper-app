@@ -2,7 +2,7 @@
   "name": "@morning-paper/desktop",
   "private": true,
   "license": "MIT",
-  "version": "0.8.4",
+  "version": "0.8.5",
   "type": "module",
   "scripts": {
     "dev": "vite",

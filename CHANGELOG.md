@@ -6,6 +6,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 
 ## [Não lançado]
 
+## [0.8.5] - 2026-10-09
+
 ### Adicionado
 
 - Documentação para contribuição: licença MIT, guia de contribuição, código de conduta, política de segurança e modelos de issue e pull request.
@@ -21,5 +23,6 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 
 Primeira versão pública.
 
-[Não lançado]: https://github.com/julianosirtori/morning-paper-app/compare/v0.8.4...HEAD
+[Não lançado]: https://github.com/julianosirtori/morning-paper-app/compare/v0.8.5...HEAD
+[0.8.5]: https://github.com/julianosirtori/morning-paper-app/compare/v0.8.4...v0.8.5
 [0.8.4]: https://github.com/julianosirtori/morning-paper-app/releases/tag/v0.8.4
