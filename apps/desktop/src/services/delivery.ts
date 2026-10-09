@@ -14,7 +14,15 @@ import { toast } from "../store/toasts";
 /** Imprime sozinho só se a edição saiu perto do horário (não às 15h porque o Mac estava desligado). */
 const MAX_LATE_TO_PRINT = 120;
 
-const frame = () => new Promise((r) => requestAnimationFrame(() => r(null)));
+/**
+ * Um quadro, ou 100 ms se a tela não estiver desenhando: com o monitor apagado ou o Mac bloqueado o
+ * requestAnimationFrame não dispara, e em 09/10 a impressão das 06:03 esperou até 08:56, quando a tela acendeu.
+ */
+const frame = () =>
+  new Promise((r) => {
+    requestAnimationFrame(() => r(null));
+    setTimeout(() => r(null), 100);
+  });
 
 /** Espera o React desenhar as folhas de impressão e as fotos carregarem (no máximo 10 s). */
 export async function waitForPrintSheets() {

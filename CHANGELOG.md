@@ -14,6 +14,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 ### Corrigido
 
 - A edição agendada não terminava com a janela fechada: o resumo da IA ficava parado até o app ser aberto, e só então a edição era impressa.
+- Com o monitor apagado ou o Mac bloqueado, a edição agendada ficava pronta mas só era salva em PDF e impressa quando a tela acendia.
 - Uma edição que demora mais de duas horas para ficar pronta não é mais impressa sozinha.
 
 ## [0.8.4]
