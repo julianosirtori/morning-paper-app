@@ -51,6 +51,15 @@
     ],
     "macOS": {
       "minimumSystemVersion": "11.0"
+    },
+    "createUpdaterArtifacts": true
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDhBNDQ5RkIzOTg2Q0MxMTUKUldRVndXeVlzNTlFaXZ0WTJOVDdRemREczlaNndQSkk3Z1d4ZTEvK1ZMTzdLV2cvNWxJTktoWmQK",
+      "endpoints": [
+        "https://github.com/julianosirtori/morning-paper-app/releases/latest/download/latest.json"
+      ]
     }
   }
 }

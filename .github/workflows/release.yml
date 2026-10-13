@@ -41,6 +41,10 @@ jobs:
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Assina o .app.tar.gz da atualização automática; o tauri-action publica o latest.json
+          # que o app consulta (plugins.updater em tauri.conf.json). Chave local: ~/.tauri/morning-paper.key
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ""
         with:
           projectPath: apps/desktop
           tauriScript: pnpm tauri

@@ -6,6 +6,7 @@
 //! - Ocultar do Dock sempre, abrir ao iniciar o Mac (plugin autostart).
 //! - Impressoras reais via CUPS (`lpstat`) e diálogo de impressão nativo.
 //! - Detecção dos assistentes de IA de linha de comando no PATH do usuário.
+//! - Atualização automática pelo release do GitHub (`updater.rs`).
 
 mod activity;
 mod ai;
@@ -14,6 +15,7 @@ mod pdf;
 mod scheduler;
 mod storage;
 mod system;
+mod updater;
 
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Mutex;
@@ -155,6 +157,8 @@ async fn export_pdf(
     window: tauri::WebviewWindow,
     path: String,
 ) -> Result<(), String> {
+    let busy = app.state::<updater::Busy>();
+    let _busy = busy.start();
     activity::log(&app, format!("[pdf] exportando {}", path));
     let start = std::time::Instant::now();
     match pdf::export_pdf(window, path).await {
@@ -178,6 +182,8 @@ async fn print_pdf(
     printer: String,
     copies: u32,
 ) -> Result<(), String> {
+    let busy = app.state::<updater::Busy>();
+    let _busy = busy.start();
     let copies_text = if copies == 1 { "cópia" } else { "cópias" };
     activity::log(
         &app,
@@ -203,7 +209,9 @@ async fn print_pdf(
 }
 
 #[tauri::command]
-async fn fetch_feeds(feeds: Vec<feeds::FeedRequest>) -> Vec<feeds::FeedResult> {
+async fn fetch_feeds(app: AppHandle, feeds: Vec<feeds::FeedRequest>) -> Vec<feeds::FeedResult> {
+    let busy = app.state::<updater::Busy>();
+    let _busy = busy.start();
     feeds::fetch_all(feeds).await
 }
 
@@ -214,6 +222,8 @@ async fn run_agent(
     path: String,
     prompt: String,
 ) -> Result<String, String> {
+    let busy = app.state::<updater::Busy>();
+    let _busy = busy.start();
     let n_chars = prompt.len();
     activity::log(&app, format!("[ia] {} iniciou ({} caracteres)", agent, n_chars));
     let start = std::time::Instant::now();
@@ -394,11 +404,13 @@ pub fn run() {
     let app = tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_notification::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_autostart::init(
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
             Some(vec!["--hidden"]),
         ))
         .manage(scheduler::SchedulerState::default())
+        .manage(updater::Busy::default())
         .manage(AppState {
             keep_running: AtomicBool::new(true),
             show_tray: AtomicBool::new(true),
@@ -427,6 +439,7 @@ pub fn run() {
             build_tray(app.handle())?;
             pdf::debug_on_start(app.handle());
             scheduler::start(app.handle().clone());
+            updater::start(app.handle().clone());
             // Iniciado pelo login do Mac: começa discretamente, sem abrir a janela.
             if std::env::args().any(|a| a == "--hidden") {
                 update_dock(app.handle(), false);

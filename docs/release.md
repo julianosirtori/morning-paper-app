@@ -4,6 +4,12 @@
 - **`release.yml`** (tag `v*`): confere se a tag bate com a versão em `package.json` e `tauri.conf.json`, roda os testes, gera o `.dmg` e publica no release do GitHub, de onde a landing baixa. Para lançar, veja [Lançando uma versão](#lançando-uma-versão).
 - **`landing.yml`**: publica a landing no GitHub Pages.
 
+## Atualização automática
+
+O app procura versões novas a cada 6 horas no `latest.json` do release mais recente (`plugins.updater` em `tauri.conf.json`), baixa, instala e reinicia escondido quando está ocioso: janela fechada, sem IA, PDF ou impressão nos últimos 10 minutos e fora da meia hora antes da edição (`src-tauri/src/updater.rs`). O progresso fica no log de atividade, com o prefixo `[atualização]`.
+
+O `release.yml` assina o pacote da atualização com o secret `TAURI_SIGNING_PRIVATE_KEY`, cuja chave fica em `~/.tauri/morning-paper.key` (sem senha). Guarde uma cópia dela: sem ela, os apps instalados não aceitam mais atualizações e todo mundo precisa reinstalar pelo `.dmg`. O `pnpm app:build` (e o build da CI) não gera o pacote de atualização, então não precisa da chave.
+
 O `.dmg` não é assinado nem notarizado; por isso a landing explica como abrir em Ajustes do Sistema › Privacidade e Segurança. Para assinar, configure os secrets de certificado da Apple no `tauri-action`.
 
 ## Lançando uma versão

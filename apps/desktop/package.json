@@ -11,7 +11,7 @@
     "typecheck": "tsc -b",
     "tauri": "tauri",
     "app": "tauri dev",
-    "app:build": "tauri build",
+    "app:build": "tauri build --config '{\"bundle\":{\"createUpdaterArtifacts\":false}}'",
     "test": "vitest run",
     "check": "tsc -b && vitest run && cargo test --manifest-path src-tauri/Cargo.toml",
     "test:e2e": "playwright test"

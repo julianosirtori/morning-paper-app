@@ -6,6 +6,10 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 
 ## [Não lançado]
 
+### Adicionado
+
+- Atualização automática: o app baixa e instala versões novas sozinho e reinicia quando está ocioso, com a janela fechada e longe do horário da edição. Esta é a última versão que precisa ser instalada pelo `.dmg`.
+
 ## [0.8.5] - 2026-10-09
 
 ### Adicionado

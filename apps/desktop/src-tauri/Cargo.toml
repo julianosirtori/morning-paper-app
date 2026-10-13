@@ -26,6 +26,7 @@ feed-rs = "2"
 futures = "0.3"
 tokio = { version = "1", features = ["time", "process", "io-util", "sync", "rt", "macros"] }
 chrono = { version = "0.4", features = ["serde"] }
+tauri-plugin-updater = "2"
 
 [target.'cfg(target_os = "macos")'.dependencies]
 objc2 = "0.6"
