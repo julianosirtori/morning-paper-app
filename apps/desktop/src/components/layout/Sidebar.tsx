@@ -4,8 +4,9 @@ import { Icon, type IconName } from "../ui/Icon";
 import { useNavigation, type ViewId } from "../../store/navigation";
 import { useLatestEdition } from "../../store/editions";
 import { useActiveSourceCount } from "../../store/sources";
-
-const APP_VERSION = "0.8.4";
+import { useUpdate } from "../../store/update";
+import { restartToUpdate } from "../../lib/native";
+import { version as APP_VERSION } from "../../../package.json";
 
 type NavItem = { id: ViewId; label: string; icon: IconName; count?: number };
 
@@ -73,7 +74,27 @@ export function Sidebar() {
       <div className="mt-auto border-t border-line px-2.5 pt-4 text-12 text-muted">
         <b className="block font-semibold text-ink">{t("app.footerTitle", { version: APP_VERSION })}</b>
         {t("app.footerNote")}
+        <UpdateNotice />
       </div>
     </aside>
+  );
+}
+
+/** Versão nova esperando: reinicia na hora ou leva às Preferências para instalar. */
+function UpdateNotice() {
+  const { t } = useTranslation();
+  const phase = useUpdate((s) => s.status?.phase);
+  const version = useUpdate((s) => s.status?.version);
+  const go = useNavigation((s) => s.go);
+  if (!version || (phase !== "ready" && phase !== "available")) return null;
+  return (
+    <div className="mt-3 grid gap-1 rounded-ctl border border-ink bg-paper p-2.5 text-ink" role="status">
+      <b className="font-semibold">{t(phase === "ready" ? "update.sidebar.ready" : "update.sidebar.available", { version })}</b>
+      {phase === "ready" ? (
+        <button type="button" className="btn-text justify-self-start" onClick={() => restartToUpdate()}>{t("update.restart")}</button>
+      ) : (
+        <button type="button" className="btn-text justify-self-start" onClick={() => go("preferencias", { focus: "updates-pref" })}>{t("update.see")}</button>
+      )}
+    </div>
   );
 }

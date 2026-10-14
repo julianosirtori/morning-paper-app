@@ -7,6 +7,7 @@ import { StyleSection } from "./StyleSection";
 import { BackgroundSection } from "./BackgroundSection";
 import { AssistantSection } from "./AssistantSection";
 import { AdvancedSection } from "./AdvancedSection";
+import { UpdatesSection } from "./UpdatesSection";
 
 export function PreferencesView() {
   const { t } = useTranslation();
@@ -21,6 +22,7 @@ export function PreferencesView() {
         <BackgroundSection />
         <AssistantSection />
         <AdvancedSection />
+        <UpdatesSection />
       </div>
     </>
   );

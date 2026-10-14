@@ -5,6 +5,7 @@ import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 import { PDF_PRINTER, SAMPLE_AGENT_PATHS, SAMPLE_PRINTERS } from "../data/system";
 import type { Connection, Printer, Repeat } from "../data/types";
 import { sampleFeeds } from "./sampleFeeds";
+import { version as APP_VERSION } from "../../package.json";
 
 export const isTauri = () => typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
 
@@ -212,4 +213,46 @@ export async function notify(title: string, body: string) {
 export function logEvent(message: string): void {
   if (!isTauri()) return;
   invoke("log_event", { message }).catch(() => {});
+}
+
+/* ---------- Atualizações (src-tauri/src/updater.rs) ---------- */
+
+export type UpdatePhase = "idle" | "checking" | "upToDate" | "available" | "downloading" | "ready" | "error";
+export type UpdateStatus = {
+  phase: UpdatePhase;
+  current: string;
+  version: string | null;
+  progress: number | null;
+  error: string | null;
+  checkedAt: string | null;
+};
+
+export async function updateStatus(): Promise<UpdateStatus> {
+  if (!isTauri()) return { phase: "idle", current: APP_VERSION, version: null, progress: null, error: null, checkedAt: null };
+  return invoke("update_status");
+}
+
+/** Procura versão nova agora; com `install`, já baixa e instala. Na prévia do navegador, nunca há. */
+export async function checkUpdate(install = false): Promise<UpdateStatus> {
+  if (!isTauri()) {
+    await wait(600);
+    return { phase: "upToDate", current: APP_VERSION, version: null, progress: null, error: null, checkedAt: new Date().toISOString() };
+  }
+  return invoke("check_update", { install });
+}
+
+export async function setAutoUpdate(enabled: boolean) {
+  if (!isTauri()) return;
+  await invoke("set_auto_update", { enabled });
+}
+
+/** Reabre o app na versão já instalada. */
+export async function restartToUpdate() {
+  if (!isTauri()) return;
+  await invoke("restart_to_update");
+}
+
+export async function onUpdateStatus(cb: (s: UpdateStatus) => void): Promise<UnlistenFn> {
+  if (!isTauri()) return () => {};
+  return listen<UpdateStatus>("update-status", (e) => cb(e.payload));
 }

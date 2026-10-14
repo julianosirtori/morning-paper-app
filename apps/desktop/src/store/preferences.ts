@@ -23,6 +23,10 @@ type PreferencesState = {
   onboarded: boolean;
   /** Dia sem edição ("Pausar até amanhã"), "YYYY-MM-DD". */
   skipDate: string | null;
+  /** Baixa e instala versões novas sozinho; desligado, só avisa. */
+  autoUpdate: boolean;
+  /** Última versão aberta, para avisar "Atualizado para X" depois de reiniciar. */
+  seenVersion: string | null;
   set: (patch: Partial<Omit<PreferencesState, "set" | "setTopic" | "setBackground">>) => void;
   setTopic: (index: number, value: number) => void;
   setBackground: (patch: Partial<Background>) => void;
@@ -67,6 +71,8 @@ export const usePreferences = create<PreferencesState>()(
       agentId: "claude",
       onboarded: false,
       skipDate: null,
+      autoUpdate: true,
+      seenVersion: null,
       set: (patch) => set(patch),
       setTopic: (i, v) => set((s) => ({ topics: rebalanceTopics(s.topics, i, v) })),
       setBackground: (patch) =>

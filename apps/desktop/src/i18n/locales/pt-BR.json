@@ -598,5 +598,34 @@
     "title": "Esta tela não abriu.",
     "text": "Suas edições e preferências continuam salvas. Recarregue o app ou volte para outra tela pela barra lateral.",
     "reload": "Recarregar"
+  },
+  "update": {
+    "title": "Atualizações",
+    "note": "Versão {{version}}. O Morning Paper procura versões novas a cada 6 horas.",
+    "idle": "Ainda não procurou nesta sessão.",
+    "check": "Procurar atualizações",
+    "checking": "Procurando…",
+    "upToDate": "Você está na versão mais recente.",
+    "available": "Versão {{version}} disponível.",
+    "downloading": "Baixando a versão {{version}}… {{pct}}%",
+    "ready": "Versão {{version}} instalada. Vale ao reiniciar.",
+    "error": "Não deu para procurar agora. Tenta de novo mais tarde.",
+    "install": "Instalar {{version}}",
+    "restart": "Reiniciar agora",
+    "see": "Ver atualização",
+    "auto": "Instalar atualizações automaticamente",
+    "autoNote": "Baixa sozinho e reinicia com a janela fechada, longe do horário da edição",
+    "sidebar": {
+      "ready": "Versão {{version}} pronta",
+      "available": "Versão {{version}} disponível"
+    },
+    "notify": {
+      "title": "Morning Paper",
+      "available": "A versão {{version}} está disponível. Instale em Preferências › Atualizações.",
+      "ready": "A versão {{version}} foi instalada. O app reinicia sozinho quando estiver ocioso."
+    },
+    "toast": {
+      "updated": "Morning Paper atualizado para a versão {{version}}."
+    }
   }
 }
