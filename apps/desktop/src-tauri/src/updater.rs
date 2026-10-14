@@ -1,16 +1,20 @@
-//! Atualização automática: o app fica dias aberto só na barra de menus, então ele mesmo procura
-//! versões novas no release do GitHub (latest.json), baixa, instala e reinicia escondido.
+//! Atualizações: o app fica dias aberto só na barra de menus, então ele mesmo procura versões novas
+//! no release do GitHub (latest.json). Com "Instalar automaticamente" ligado, baixa, instala e
+//! reinicia escondido; desligado, só avisa e a pessoa instala pelas Preferências. O React acompanha
+//! tudo pelo evento `update-status` (aviso na barra lateral, Preferências e notificação).
 //!
-//! O reinício espera um momento quieto: janela fechada, nada de IA, PDF ou impressão em andamento
+//! O reinício automático espera um momento quieto: janela fechada, nada de IA, PDF ou impressão em andamento
 //! (nem nos últimos minutos) e longe do horário da edição. Em 13/10 a correção da impressão das 06:00
 //! estava publicada havia 4 dias, mas o Mac continuava na versão antiga.
 
-use std::sync::atomic::{AtomicI64, AtomicUsize, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicI64, AtomicUsize, Ordering};
+use std::sync::Mutex;
 use std::time::Duration;
 
 use chrono::{Local, NaiveDate, NaiveTime};
-use tauri::{AppHandle, Manager};
-use tauri_plugin_updater::UpdaterExt;
+use serde::Serialize;
+use tauri::{AppHandle, Emitter, Manager};
+use tauri_plugin_updater::{Update, UpdaterExt};
 
 use crate::scheduler::{Schedule, SchedulerState};
 
@@ -78,6 +82,75 @@ pub fn quiet(
     !(pending_today && (at - now).num_minutes() < BEFORE_SCHEDULE_MINUTES)
 }
 
+/// Etapa da atualização, mostrada no React.
+#[derive(Serialize, Clone, Copy, PartialEq, Debug, Default)]
+#[serde(rename_all = "camelCase")]
+pub enum Phase {
+    #[default]
+    Idle,
+    Checking,
+    UpToDate,
+    /// Há versão nova e a instalação automática está desligada.
+    Available,
+    Downloading,
+    /// Instalada em disco; vale depois de reiniciar.
+    Ready,
+    Error,
+}
+
+#[derive(Serialize, Clone, Default, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct Status {
+    pub phase: Phase,
+    pub current: String,
+    /// Versão nova (disponível, baixando ou pronta).
+    pub version: Option<String>,
+    /// Progresso do download, de 0 a 1.
+    pub progress: Option<f64>,
+    pub error: Option<String>,
+    /// Última verificação (ISO 8601).
+    pub checked_at: Option<String>,
+}
+
+pub struct UpdateState {
+    status: Mutex<Status>,
+    /// Preferência "Instalar atualizações automaticamente" (vem do React).
+    pub auto: AtomicBool,
+    /// Uma verificação ou instalação por vez.
+    working: AtomicBool,
+    /// Já há uma tarefa esperando o momento quieto para reiniciar.
+    restart_scheduled: AtomicBool,
+    /// Versão encontrada na última verificação, para instalar sem baixar o latest.json de novo.
+    pending: Mutex<Option<Update>>,
+}
+
+impl Default for UpdateState {
+    fn default() -> Self {
+        Self {
+            status: Mutex::new(Status::default()),
+            auto: AtomicBool::new(true),
+            working: AtomicBool::new(false),
+            restart_scheduled: AtomicBool::new(false),
+            pending: Mutex::new(None),
+        }
+    }
+}
+
+pub fn status(app: &AppHandle) -> Status {
+    let mut s = app.state::<UpdateState>().status.lock().unwrap().clone();
+    s.current = app.package_info().version.to_string();
+    s
+}
+
+fn set_status(app: &AppHandle, f: impl FnOnce(&mut Status)) {
+    {
+        let state = app.state::<UpdateState>();
+        let mut s = state.status.lock().unwrap();
+        f(&mut s);
+    }
+    let _ = app.emit("update-status", status(app));
+}
+
 pub fn start(app: AppHandle) {
     // Em `tauri dev` não há o que atualizar: o binário não está num .app.
     if cfg!(debug_assertions) {
@@ -86,36 +159,116 @@ pub fn start(app: AppHandle) {
     tauri::async_runtime::spawn(async move {
         tokio::time::sleep(FIRST_CHECK).await;
         loop {
-            match install_update(&app).await {
-                Ok(Some(version)) => {
-                    wait_quiet(&app).await;
-                    crate::activity::log(&app, format!("[atualização] reiniciando na versão {version}"));
-                    restart_hidden(&app);
-                }
-                Ok(None) => {}
-                Err(e) => crate::activity::log(&app, format!("[atualização] falhou: {e}")),
-            }
+            let _ = check(&app, false).await;
             tokio::time::sleep(CHECK_EVERY).await;
         }
     });
 }
 
-/// Procura versão nova; se houver, baixa e substitui o app em disco. Devolve a versão instalada.
-async fn install_update(app: &AppHandle) -> Result<Option<String>, String> {
-    let updater = app.updater().map_err(|e| e.to_string())?;
-    let Some(update) = updater.check().await.map_err(|e| e.to_string())? else {
-        return Ok(None);
+/// Procura versão nova. Com a instalação automática ligada (ou `install`), baixa e instala na hora.
+pub async fn check(app: &AppHandle, install: bool) -> Result<Status, String> {
+    let state = app.state::<UpdateState>();
+    if state.status.lock().unwrap().phase == Phase::Ready {
+        return Ok(status(app));
+    }
+    if state.working.swap(true, Ordering::SeqCst) {
+        return Ok(status(app));
+    }
+    let result = check_inner(app, install).await;
+    state.working.store(false, Ordering::SeqCst);
+    if let Err(e) = &result {
+        crate::activity::log(app, format!("[atualização] falhou: {e}"));
+        set_status(app, |s| {
+            s.phase = Phase::Error;
+            s.error = Some(e.clone());
+            s.progress = None;
+        });
+    }
+    result.map(|_| status(app))
+}
+
+async fn check_inner(app: &AppHandle, install: bool) -> Result<(), String> {
+    let state = app.state::<UpdateState>();
+    let pending = state.pending.lock().unwrap().take();
+    let update = match pending {
+        Some(u) if install => Some(u),
+        _ => {
+            set_status(app, |s| {
+                s.phase = Phase::Checking;
+                s.error = None;
+            });
+            let updater = app.updater().map_err(|e| e.to_string())?;
+            let found = updater.check().await.map_err(|e| e.to_string())?;
+            set_status(app, |s| s.checked_at = Some(Local::now().to_rfc3339()));
+            found
+        }
     };
+    let Some(update) = update else {
+        set_status(app, |s| {
+            s.phase = Phase::UpToDate;
+            s.version = None;
+        });
+        return Ok(());
+    };
+    let version = update.version.clone();
+    if !install && !state.auto.load(Ordering::SeqCst) {
+        crate::activity::log(app, format!("[atualização] {version} disponível"));
+        set_status(app, |s| {
+            s.phase = Phase::Available;
+            s.version = Some(version);
+        });
+        *state.pending.lock().unwrap() = Some(update);
+        return Ok(());
+    }
+
     crate::activity::log(
         app,
-        format!("[atualização] baixando {} (atual {})", update.version, update.current_version),
+        format!("[atualização] baixando {version} (atual {})", update.current_version),
     );
+    set_status(app, |s| {
+        s.phase = Phase::Downloading;
+        s.version = Some(version.clone());
+        s.progress = Some(0.0);
+    });
+    let mut done = 0usize;
+    let mut last_pct = -1i64;
+    let progress_app = app.clone();
     update
-        .download_and_install(|_, _| {}, || {})
+        .download_and_install(
+            move |chunk, total| {
+                done += chunk;
+                let Some(total) = total.filter(|t| *t > 0) else { return };
+                let p = done as f64 / total as f64;
+                // Um evento a cada 5%, não um por pedaço baixado.
+                let pct = (p * 20.0) as i64;
+                if pct != last_pct {
+                    last_pct = pct;
+                    set_status(&progress_app, |s| s.progress = Some(p.min(1.0)));
+                }
+            },
+            || {},
+        )
         .await
         .map_err(|e| e.to_string())?;
-    crate::activity::log(app, format!("[atualização] {} instalada, reinicia quando estiver ocioso", update.version));
-    Ok(Some(update.version))
+    crate::activity::log(app, format!("[atualização] {version} instalada, reinicia quando estiver ocioso"));
+    set_status(app, |s| {
+        s.phase = Phase::Ready;
+        s.progress = None;
+    });
+    schedule_restart(app);
+    Ok(())
+}
+
+/// Espera o momento quieto e reinicia na versão nova.
+fn schedule_restart(app: &AppHandle) {
+    if app.state::<UpdateState>().restart_scheduled.swap(true, Ordering::SeqCst) {
+        return;
+    }
+    let app = app.clone();
+    tauri::async_runtime::spawn(async move {
+        wait_quiet(&app).await;
+        restart(&app, true);
+    });
 }
 
 async fn wait_quiet(app: &AppHandle) {
@@ -134,11 +287,16 @@ async fn wait_quiet(app: &AppHandle) {
     }
 }
 
-/// Reabre a versão nova com `--hidden`, como no login do Mac: só na barra de menus, sem janela.
-fn restart_hidden(app: &AppHandle) -> ! {
+/// Reabre o app na versão nova. Escondido (`--hidden`, como no login do Mac) no reinício automático;
+/// com a janela aberta quando a pessoa clica em "Reiniciar agora".
+pub fn restart(app: &AppHandle, hidden: bool) -> ! {
+    let version = status(app).version.unwrap_or_default();
+    crate::activity::log(app, format!("[atualização] reiniciando na versão {version}"));
     let mut env = app.env();
     env.args_os.truncate(1);
-    env.args_os.push("--hidden".into());
+    if hidden {
+        env.args_os.push("--hidden".into());
+    }
     tauri::process::restart(&env)
 }
 

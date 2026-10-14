@@ -598,5 +598,34 @@
     "title": "This screen didn't open.",
     "text": "Your editions and preferences are still saved. Reload the app or go to another screen from the sidebar.",
     "reload": "Reload"
+  },
+  "update": {
+    "title": "Updates",
+    "note": "Version {{version}}. Morning Paper checks for new versions every 6 hours.",
+    "idle": "Not checked yet this session.",
+    "check": "Check for updates",
+    "checking": "Checking…",
+    "upToDate": "You're on the latest version.",
+    "available": "Version {{version}} is available.",
+    "downloading": "Downloading version {{version}}… {{pct}}%",
+    "ready": "Version {{version}} installed. It takes effect after a restart.",
+    "error": "Couldn't check right now. Try again later.",
+    "install": "Install {{version}}",
+    "restart": "Restart now",
+    "see": "See update",
+    "auto": "Install updates automatically",
+    "autoNote": "Downloads on its own and restarts with the window closed, away from edition time",
+    "sidebar": {
+      "ready": "Version {{version}} ready",
+      "available": "Version {{version}} available"
+    },
+    "notify": {
+      "title": "Morning Paper",
+      "available": "Version {{version}} is available. Install it in Preferences › Updates.",
+      "ready": "Version {{version}} was installed. The app restarts on its own when idle."
+    },
+    "toast": {
+      "updated": "Morning Paper updated to version {{version}}."
+    }
   }
 }

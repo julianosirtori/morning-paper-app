@@ -6,7 +6,7 @@
 
 ## Atualização automática
 
-O app procura versões novas a cada 6 horas no `latest.json` do release mais recente (`plugins.updater` em `tauri.conf.json`), baixa, instala e reinicia escondido quando está ocioso: janela fechada, sem IA, PDF ou impressão nos últimos 10 minutos e fora da meia hora antes da edição (`src-tauri/src/updater.rs`). O progresso fica no log de atividade, com o prefixo `[atualização]`.
+O app procura versões novas a cada 6 horas no `latest.json` do release mais recente (`plugins.updater` em `tauri.conf.json`), baixa, instala e reinicia escondido quando está ocioso: janela fechada, sem IA, PDF ou impressão nos últimos 10 minutos e fora da meia hora antes da edição (`src-tauri/src/updater.rs`). Com "Instalar atualizações automaticamente" desligado nas Preferências, ele só avisa e a pessoa instala por lá. O React acompanha pelo evento `update-status` (aviso na barra lateral, seção Atualizações e notificação do macOS). O progresso fica no log de atividade, com o prefixo `[atualização]`.
 
 O `release.yml` assina o pacote da atualização com o secret `TAURI_SIGNING_PRIVATE_KEY`, cuja chave fica em `~/.tauri/morning-paper.key` (sem senha). Guarde uma cópia dela: sem ela, os apps instalados não aceitam mais atualizações e todo mundo precisa reinstalar pelo `.dmg`. O `pnpm app:build` (e o build da CI) não gera o pacote de atualização, então não precisa da chave.
 

@@ -279,6 +279,28 @@ fn log_event(app: AppHandle, message: String) {
 }
 
 #[tauri::command]
+fn update_status(app: AppHandle) -> updater::Status {
+    updater::status(&app)
+}
+
+/// Procura atualização agora; com `install`, baixa e instala mesmo com a instalação automática desligada.
+#[tauri::command]
+async fn check_update(app: AppHandle, install: bool) -> Result<updater::Status, String> {
+    updater::check(&app, install).await
+}
+
+#[tauri::command]
+fn set_auto_update(app: AppHandle, enabled: bool) {
+    app.state::<updater::UpdateState>().auto.store(enabled, Ordering::Relaxed);
+}
+
+/// "Reiniciar agora": abre a versão nova com a janela à vista.
+#[tauri::command]
+fn restart_to_update(app: AppHandle) {
+    updater::restart(&app, false);
+}
+
+#[tauri::command]
 fn system_locale() -> String {
     system::system_locale()
 }
@@ -411,6 +433,7 @@ pub fn run() {
         ))
         .manage(scheduler::SchedulerState::default())
         .manage(updater::Busy::default())
+        .manage(updater::UpdateState::default())
         .manage(AppState {
             keep_running: AtomicBool::new(true),
             show_tray: AtomicBool::new(true),
@@ -433,7 +456,11 @@ pub fn run() {
             set_schedule,
             set_wake,
             show_main_window,
-            log_event
+            log_event,
+            update_status,
+            check_update,
+            set_auto_update,
+            restart_to_update
         ])
         .setup(|app| {
             build_tray(app.handle())?;

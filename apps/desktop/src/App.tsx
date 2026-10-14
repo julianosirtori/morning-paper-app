@@ -17,6 +17,7 @@ import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import { useNativeSync } from "./hooks/useNativeSync";
 import { useTrayActions } from "./hooks/useTrayActions";
 import { useScheduledEditions } from "./hooks/useScheduledEditions";
+import { useUpdates } from "./hooks/useUpdates";
 import { useNavigation, type ViewId } from "./store/navigation";
 import { usePreferences } from "./store/preferences";
 import { OnboardingView } from "./features/onboarding/OnboardingView";
@@ -37,6 +38,7 @@ export default function App() {
   useTrayActions();
   useNativeSync();
   useScheduledEditions();
+  useUpdates();
 
   const view = useNavigation((s) => s.view);
   const onboarded = usePreferences((s) => s.onboarded);

@@ -9,6 +9,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 ### Adicionado
 
 - Atualização automática: o app baixa e instala versões novas sozinho e reinicia quando está ocioso, com a janela fechada e longe do horário da edição. Esta é a última versão que precisa ser instalada pelo `.dmg`.
+- Seção Atualizações nas Preferências: versão atual, botão para procurar agora e opção de só avisar, sem instalar sozinho.
+- Aviso na barra lateral e notificação do macOS quando há versão nova, com "Reiniciar agora" para aplicar na hora.
 
 ## [0.8.5] - 2026-10-09
 
